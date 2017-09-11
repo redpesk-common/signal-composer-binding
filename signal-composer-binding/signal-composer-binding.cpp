@@ -13,27 +13,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-#include <ctl-config.h>
+#include <string.h>
+// afb-utilities
+#include <wrap-json.h>
+#include <filescan-utils.h>
+// controller
+#include <ctl-lua.h>
 
 #include "signal-composer-binding.hpp"
 #include "signal-composer-apidef.h"
-#include "wrap-json.h"
 #include "signal-composer.hpp"
-
-SignalComposer SigComp;
-static CtlConfigT *ctlConfig=NULL;
 
 /// @brief callback for receiving message from low binding. Treatment itself is made in SigComp class.
 void onEvent(const char *event, json_object *object)
 {
-	SigComp.treatMessage(object);
 }
 /// @brief entry point for client subscription request. Treatment itself is made in SigComp class.
 void subscribe(afb_req request)
 {
-	if(SigComp.subscribe(request))
+	if(true)
 		afb_req_success(request, NULL, NULL);
 	else
 		afb_req_fail(request, "error", NULL);
@@ -42,7 +42,7 @@ void subscribe(afb_req request)
 /// @brief entry point for client un-subscription request. Treatment itself is made in SigComp class.
 void unsubscribe(afb_req request)
 {
-	if(SigComp.unsubscribe(request))
+	if(true)
 		afb_req_success(request, NULL, NULL);
 	else
 		afb_req_fail(request, "error when unsubscribe", NULL);
@@ -55,7 +55,7 @@ void loadConf(afb_req request)
 	const char* confd;
 
 	wrap_json_unpack(args, "{s:s}", "path", &confd);
-	int ret = SigComp.parseConfigAndSubscribe(confd);
+	int ret = 0;
 	if( ret == 0)
 		afb_req_success(request, NULL, NULL);
 	else
@@ -66,39 +66,49 @@ void loadConf(afb_req request)
 void get(afb_req request)
 {
 	json_object *jobj;
-	if(SigComp.get(request, &jobj))
+	if(true)
 	{
 		afb_req_success(request, jobj, NULL);
-	} else {
+	}
+	else
+	{
 		afb_req_fail(request, "error", NULL);
 	}
 }
 
-/// @brief entry point for systemD timers. Treatment itself is made in SigComp class.
-/// @param[in] source: systemD timer, t: time of tick, data: interval (ms).
-int ticked(sd_event_source *source, uint64_t t, void* data)
-{
-	SigComp.tick(source, t, data);
-	return 0;
-}
-
 int loadConf()
 {
-	int errcount=0;
+	int ret = 0;
+	const char* rootdir = strncat(GetBindingDirPath(), "/etc",
+		sizeof(GetBindingDirPath()) - strlen(GetBindingDirPath()) -1);
 
-	ctlConfig = CtlConfigLoad();
+	bindingApp& bApp = bindingApp::instance();
+	bApp.loadConfig(rootdir);
 
 	#ifdef CONTROL_SUPPORT_LUA
-		errcount += LuaLibInit();
+		ret += LuaConfigLoad();
 	#endif
 
-	return errcount;
+	return ret;
 }
 
 int execConf()
 {
-	int err = CtlConfigExec();
+	bindingApp& bApp = bindingApp::instance();
+	int ret = CtlConfigExec(bApp.ctlConfig());
+	std::vector<std::shared_ptr<Signal>> allSignals = bApp.getAllSignals();
+	ssize_t sigCount = allSignals.size();
 
-	AFB_DEBUG ("Signal Composer Control configuration Done errcount=%d", errcount);
-	return errcount;
+	for(auto& sig: allSignals)
+	{
+		if( (ret = sig->recursionCheck()) )
+		{
+			AFB_ERROR("There is an infinite recursion loop in your signals definition. Root coming from signal: %s", sig->id().c_str());
+			return ret;
+		}
+	}
+
+	AFB_DEBUG("Signal Composer Control configuration Done.\n signals=%d", (int)sigCount);
+
+	return ret;
 }

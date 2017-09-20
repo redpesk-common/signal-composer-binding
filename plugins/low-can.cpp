@@ -26,7 +26,6 @@
 #include "ctl-plugin.h"
 #include "wrap-json.h"
 
-
 #include "signal-composer.hpp"
 
 extern "C"
@@ -115,7 +114,7 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ, context) {
 	err = afb_service_call_sync("low-can", "subscribe", subscribeArgsJ, &responseJ);
 	if(err)
 	{
-		AFB_ERROR("Can't find api 'low-can'");
+		AFB_ERROR("Subscribe to 'low-can/%s' %s", lowEvent.c_str(), json_object_to_json_string(responseJ));
 		return err;
 	}
 

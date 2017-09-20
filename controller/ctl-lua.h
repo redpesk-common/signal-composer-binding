@@ -25,6 +25,10 @@
 #define _GNU_SOURCE
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // prefix start debug script
 #ifndef CONTROL_DOSCRIPT_PRE
 #define CONTROL_DOSCRIPT_PRE "debug"
@@ -33,11 +37,6 @@
 // default event name used by LUA
 #ifndef CONTROL_LUA_EVENT
 #define CONTROL_LUA_EVENT "luaevt"
-#endif
-
-// default use same search path for config.json and script.lua
-#ifndef CONTROL_LUA_PATH
-#define CONTROL_LUA_PATH CONTROL_CONFIG_PATH
 #endif
 
 #define AFB_BINDING_VERSION 2
@@ -65,7 +64,7 @@ typedef int (*Lua2cWrapperT) (lua_State* luaState, char *funcname, Lua2cFunction
 
 #define CTLP_LUALOAD Lua2cWrapperT Lua2cWrap;
 #define CTLP_LUA2C(FuncName, label,argsJ, context) static int FuncName(char*label,json_object*argsJ);\
-        int lua2c_ ## FuncName(lua_State* luaState){return((*Lua2cWrap)(luaState, MACRO_STR_VALUE(FuncName), FuncName, PLUGIN_NAME));};\
+        int lua2c_ ## FuncName(lua_State* luaState){return((*Lua2cWrap)(luaState, MACRO_STR_VALUE(FuncName), FuncName));};\
         static int FuncName(char* label, json_object* argsJ, void* context)
 
 typedef enum {
@@ -73,7 +72,6 @@ typedef enum {
     LUA_DOSTRING,
     LUA_DOSCRIPT,
 } LuaDoActionT;
-
 
 int LuaConfigLoad();
 int LuaConfigExec();
@@ -84,5 +82,9 @@ void ctlapi_lua_docall (afb_req request);
 void ctlapi_lua_dostring (afb_req request);
 void ctlapi_lua_doscript (afb_req request);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

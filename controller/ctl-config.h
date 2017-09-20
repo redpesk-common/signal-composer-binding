@@ -21,12 +21,12 @@
 #ifndef _CTL_CONFIG_INCLUDE_
 #define _CTL_CONFIG_INCLUDE_
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
 #endif
 
 #define AFB_BINDING_VERSION 2
@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 #ifndef CONTROL_CONFIG_PRE
-  #define CONTROL_CONFIG_PRE "onload"
+  #define CONTROL_CONFIG_PRE "init"
 #endif
 
 #ifndef CTL_PLUGIN_EXT
@@ -90,7 +90,11 @@ typedef struct {
 } CtlConfigT;
 
 #ifdef CONTROL_SUPPORT_LUA
-  #include "ctl-lua.h"
+    #include "ctl-lua.h"
+#else
+    typedef struct lua_State lua_State;
+    typedef void *Lua2cFunctionT;
+    typedef void* Lua2cWrapperT;
 #endif
 
 // ctl-action.c

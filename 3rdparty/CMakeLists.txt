@@ -29,6 +29,10 @@ ExternalProject_Add(${LUA}
     INSTALL_COMMAND ""
 )
 
+# Dirty trick to get directory created and not fails at
+# INTERFACE_INCLUDE_DIRECTORIES set
+execute_process(COMMAND mkdir -p ${CMAKE_SOURCE_DIR}/3rdparty/lua/src)
+
 PROJECT_TARGET_ADD(lua-lib)
 
 add_library(${TARGET_NAME} STATIC IMPORTED GLOBAL)

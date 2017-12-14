@@ -74,7 +74,6 @@ function Dump_Table(o)
    end
 end
 
-
 -- simulate C prinf function
 printf = function(s,...)
     io.write(s:format(...))

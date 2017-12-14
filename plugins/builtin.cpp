@@ -31,8 +31,6 @@ extern "C"
 {
 CTLP_LUA_REGISTER("builtin");
 
-static struct signalCBT* pluginCtx = NULL;
-
 // Call at initialisation time
 /*CTLP_ONLOAD(plugin, handle) {
 	pluginCtx = (struct signalCBT*)calloc (1, sizeof(struct signalCBT));
@@ -72,16 +70,20 @@ CTLP_LUA2C (setSignalValueWrap, source, argsJ, responseJ)
 	const char* name = nullptr;
 	double resultNum;
 	uint64_t timestamp;
+
+	struct signalCBT* ctx = (struct signalCBT*)source->context;
+
 	if(! wrap_json_unpack(argsJ, "{ss, sF, sI? !}",
 		"name", &name,
 		"value", &resultNum,
 		"timestamp", &timestamp))
 	{
-		AFB_ERROR("Fail to set value for uid: %s, argsJ: %s", source->uid, json_object_to_json_string(argsJ));
+		*responseJ = json_object_new_string("Fail to unpack JSON arguments value");
 		return -1;
 	}
+
 	struct signalValue result = resultNum;
-	pluginCtx->searchNsetSignalValue(name, timestamp*MICRO, result);
+	ctx->setSignalValue(ctx->aSignal, timestamp*MICRO, result);
 	return 0;
 }
 

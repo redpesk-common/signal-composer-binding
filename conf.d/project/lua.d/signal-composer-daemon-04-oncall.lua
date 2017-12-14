@@ -42,8 +42,6 @@ function _Unit_Converter(source, args, event)
   local sourcei, targeti = _positions[sourceunits], _positions[targetunits]
   assert(sourcei and targeti)
 
-  print(event['timestamp'])
-
   if sourcei<targeti then
 
     local base=1
@@ -52,8 +50,7 @@ function _Unit_Converter(source, args, event)
     end
 
     event["value"] = value/base
-
-    lua2c["luaSet"](source, event)
+    _lua2c['setSignalValueWrap'](source, event)
 
   elseif sourcei>targeti then
 
@@ -64,7 +61,7 @@ function _Unit_Converter(source, args, event)
 
     event["value"] = value/base
 
-    lua2c["luaSet"](source, event)
+    _lua2c["setSignalValueWrap"](source, event)
 
   else
     print("No conversion")

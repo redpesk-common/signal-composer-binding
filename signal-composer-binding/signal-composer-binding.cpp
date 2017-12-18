@@ -168,7 +168,7 @@ void unsubscribe(afb_req request)
 }
 
 /// @brief verb that loads JSON configuration (old SigComp.json file now)
-void loadConf(afb_req request)
+void addObjects(afb_req request)
 {
 	Composer& composer = Composer::instance();
 	json_object *sourcesJ = nullptr,
@@ -178,6 +178,13 @@ void loadConf(afb_req request)
 	if(filepath)
 	{
 		json_object *fileJ = json_object_from_file(filepath);
+		if(!fileJ)
+		{
+			json_object* responseJ = ScanForConfig(CONTROL_CONFIG_PATH, CTL_SCAN_RECURSIVE, filepath, ".json");
+			filepath = ConfigSearch(nullptr, responseJ);
+			if(filepath)
+				{fileJ = json_object_from_file(filepath);}
+		}
 
 		json_object_object_get_ex(fileJ, "sources", &sourcesJ);
 		json_object_object_get_ex(fileJ, "signals", &signalsJ);

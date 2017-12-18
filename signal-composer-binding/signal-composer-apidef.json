@@ -82,6 +82,9 @@
 		}
 		},
 		"x-permissions": {
+			"addObjects": {
+				"permission": "urn:AGL:permission::platform:composer:addObjects"
+			  }
 		},
 		"responses": {
 			"200": {
@@ -137,8 +140,16 @@
 				"200": {"$ref": "#/components/responses/200"}
 			}
 		},
-		"/loadConf": {
-			"description": "Load config file in directory passed as argument searching for pattern 'sig' in filename",
+		"/addObjects": {
+			"description": "Load new objects from an additional config file designated by JSON argument with the key 'file'.",
+			"get": {
+				"x-permissions": {
+				  "$ref": "#/components/x-permissions/addObjects"
+				},
+				"responses": {
+				  "200": {"$ref": "#/components/responses/200"}
+				}
+			},
 			"parameters": [
 				{
 					"in": "query",
@@ -146,10 +157,7 @@
 					"required": true,
 					"schema": { "type": "string"}
 				}
-			],
-			"responses": {
-				"200": {"$ref": "#/components/responses/200"}
-			}
+			]
 		}
 	}
 }

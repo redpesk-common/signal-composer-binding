@@ -21,31 +21,40 @@ static const char _afb_description_v2_signal_composer[] =
     "ct\"}}},\"afb-event-v2\":{\"type\":\"object\",\"required\":[\"jtype\",\""
     "event\"],\"properties\":{\"jtype\":{\"type\":\"string\",\"const\":\"afb-"
     "event\"},\"event\":{\"type\":\"string\"},\"data\":{\"type\":\"object\"}}"
-    "}},\"x-permissions\":{},\"responses\":{\"200\":{\"description\":\"A comp"
-    "lex object array response\",\"content\":{\"application/json\":{\"schema\""
-    ":{\"$ref\":\"#/components/schemas/afb-reply\"}}}}}},\"paths\":{\"/subscr"
-    "ibe\":{\"description\":\"Subscribe to a signal object\",\"parameters\":["
-    "{\"in\":\"query\",\"name\":\"event\",\"required\":false,\"schema\":{\"ty"
-    "pe\":\"string\"}}],\"responses\":{\"200\":{\"$ref\":\"#/components/respo"
-    "nses/200\"}}},\"/unsubscribe\":{\"description\":\"Unsubscribe previously"
-    " suscribed signal objects.\",\"parameters\":[{\"in\":\"query\",\"name\":"
-    "\"event\",\"required\":false,\"schema\":{\"type\":\"string\"}}],\"respon"
-    "ses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/get\":{\"d"
-    "escription\":\"Get informations about a resource or element\",\"response"
-    "s\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/list\":{\"de"
-    "scription\":\"List all signals already configured\",\"responses\":{\"200"
-    "\":{\"$ref\":\"#/components/responses/200\"}}},\"/loadConf\":{\"descript"
-    "ion\":\"Load config file in directory passed as argument searching for p"
-    "attern 'sig' in filename\",\"parameters\":[{\"in\":\"query\",\"name\":\""
-    "path\",\"required\":true,\"schema\":{\"type\":\"string\"}}],\"responses\""
-    ":{\"200\":{\"$ref\":\"#/components/responses/200\"}}}}}"
+    "}},\"x-permissions\":{\"addObjects\":{\"permission\":\"urn:AGL:permissio"
+    "n::platform:composer:addObjects\"}},\"responses\":{\"200\":{\"descriptio"
+    "n\":\"A complex object array response\",\"content\":{\"application/json\""
+    ":{\"schema\":{\"$ref\":\"#/components/schemas/afb-reply\"}}}}}},\"paths\""
+    ":{\"/subscribe\":{\"description\":\"Subscribe to a signal object\",\"par"
+    "ameters\":[{\"in\":\"query\",\"name\":\"event\",\"required\":false,\"sch"
+    "ema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"$ref\":\"#/compo"
+    "nents/responses/200\"}}},\"/unsubscribe\":{\"description\":\"Unsubscribe"
+    " previously suscribed signal objects.\",\"parameters\":[{\"in\":\"query\""
+    ",\"name\":\"event\",\"required\":false,\"schema\":{\"type\":\"string\"}}"
+    "],\"responses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/"
+    "get\":{\"description\":\"Get informations about a resource or element\","
+    "\"responses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/li"
+    "st\":{\"description\":\"List all signals already configured\",\"response"
+    "s\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/addObjects\""
+    ":{\"description\":\"Load new objects from an additional config file desi"
+    "gnated by JSON argument with the key 'file'.\",\"get\":{\"x-permissions\""
+    ":{\"$ref\":\"#/components/x-permissions/addObjects\"},\"responses\":{\"2"
+    "00\":{\"$ref\":\"#/components/responses/200\"}}},\"parameters\":[{\"in\""
+    ":\"query\",\"name\":\"path\",\"required\":true,\"schema\":{\"type\":\"st"
+    "ring\"}}]}}}"
 ;
+#ifdef __cplusplus
+#include <afb/afb-binding>
+#endif
+static const struct afb_auth _afb_auths_v2_signal_composer[] = {
+	afb::auth_permission("urn:AGL:permission::platform:composer:addObjects")
+};
 
  void subscribe(struct afb_req req);
  void unsubscribe(struct afb_req req);
  void get(struct afb_req req);
  void list(struct afb_req req);
- void loadConf(struct afb_req req);
+ void addObjects(struct afb_req req);
 
 static const struct afb_verb_v2 _afb_verbs_v2_signal_composer[] = {
     {
@@ -77,10 +86,10 @@ static const struct afb_verb_v2 _afb_verbs_v2_signal_composer[] = {
         .session = AFB_SESSION_NONE_V2
     },
     {
-        .verb = "loadConf",
-        .callback = loadConf,
-        .auth = NULL,
-        .info = "Load config file in directory passed as argument searching for pattern 'sig' in filename",
+        .verb = "addObjects",
+        .callback = addObjects,
+        .auth = &_afb_auths_v2_signal_composer[0],
+        .info = "Load new objects from an additional config file designated by JSON argument with the key 'file'.",
         .session = AFB_SESSION_NONE_V2
     },
     {

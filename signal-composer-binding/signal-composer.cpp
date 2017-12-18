@@ -264,7 +264,6 @@ int Composer::pluginsLoad(AFB_ApiT apiHandle, CtlSectionT *section, json_object 
 		}
 		else
 		{
-
 			completePluginsJ = json_object_new_array();
 			json_object_array_add(completePluginsJ, pluginsJ);
 			json_object_array_add(completePluginsJ, builtinJ);
@@ -343,6 +342,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 
 	if(sourcesJ)
 	{
+		int count = 1;
 		json_object *sigCompJ = nullptr;
 		// add the signal composer itself as source
 		wrap_json_pack(&sigCompJ, "{ss,ss,ss}",
@@ -355,7 +355,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 
 		if (json_object_get_type(sourcesJ) == json_type_array)
 		{
-			int count = json_object_array_length(sourcesJ);
+			count = json_object_array_length(sourcesJ);
 
 			for (int idx = 0; idx < count; idx++)
 			{
@@ -369,6 +369,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 			if ((err = composer.loadOneSourceAPI(sourcesJ))) return err;
 			if (sigCompJ && (err = composer.loadOneSourceAPI(sigCompJ))) return err;
 		}
+		AFB_NOTICE("%d new sources added to service", count);
 	}
 	else
 		{Composer::instance().initSourcesAPI();}
@@ -480,6 +481,7 @@ int Composer::loadOneSignal(json_object* signalJ)
 			// Overwrite uid to the signal one instead of the default
 			if(onReceivedCtl)
 				{onReceivedCtl->uid = uid;}
+		int count = 1;
 	}
 	else {onReceivedCtl = convert2Action(uid, onReceivedJ);}
 
@@ -498,10 +500,10 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 
 	if(signalsJ)
 	{
+		int count = 1;
 		if (json_object_get_type(signalsJ) == json_type_array)
 		{
-			int count = json_object_array_length(signalsJ);
-
+			count = json_object_array_length(signalsJ);
 			for (int idx = 0; idx < count; idx++)
 			{
 				json_object *signalJ = json_object_array_get_idx(signalsJ, idx);
@@ -510,6 +512,7 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 		}
 		else
 			{err = composer.loadOneSignal(signalsJ);}
+		AFB_NOTICE("%d new signals added to service", count);
 	}
 
 	return err;

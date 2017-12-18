@@ -28,7 +28,7 @@
 #include "ctl-plugin.h"
 #include "wrap-json.h"
 
-CTLP_LUA_REGISTER("gps");
+CTLP_CAPI_REGISTER("gps");
 
 // Call at initialisation time
 /*CTLP_ONLOAD(plugin, api) {

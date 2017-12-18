@@ -24,24 +24,11 @@
 #include <string.h>
 
 #include "signal-composer.hpp"
-#include "ctl-config.h"
 #include "wrap-json.h"
 
 extern "C"
 {
 CTLP_LUA_REGISTER("builtin");
-
-// Call at initialisation time
-/*CTLP_ONLOAD(plugin, handle) {
-	pluginCtx = (struct signalCBT*)calloc (1, sizeof(struct signalCBT));
-	pluginCtx = (struct signalCBT*)handle;
-
-	AFB_NOTICE ("Signal Composer builtin plugin: label='%s' info='%s'",
-		plugin->uid,
-		plugin->info);
-
-	return (void*)pluginCtx;
-}*/
 
 CTLP_CAPI (defaultOnReceived, source, argsJ, eventJ)
 {
@@ -81,9 +68,15 @@ CTLP_LUA2C (setSignalValueWrap, source, argsJ, responseJ)
 		*responseJ = json_object_new_string("Fail to unpack JSON arguments value");
 		return -1;
 	}
+	*responseJ = json_object_new_string(json_object_to_json_string(argsJ));
 
 	struct signalValue result = resultNum;
-	ctx->setSignalValue(ctx->aSignal, timestamp*MICRO, result);
+
+	if(ctx->aSignal)
+		{ctx->setSignalValue(ctx->aSignal, timestamp*MICRO, result);}
+	else
+		{ctx->searchNsetSignalValue(name, timestamp*MICRO, result);}
+
 	return 0;
 }
 

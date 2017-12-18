@@ -50,8 +50,6 @@ function _Unit_Converter(source, args, event)
     end
 
     event["value"] = value/base
-    _lua2c['setSignalValueWrap'](source, event)
-
   elseif sourcei>targeti then
 
     local base=1
@@ -60,12 +58,13 @@ function _Unit_Converter(source, args, event)
     end
 
     event["value"] = value/base
-
-    _lua2c["setSignalValueWrap"](source, event)
-
   else
     print("No conversion")
   end
+
+  print('Converted value is: '.. event['value'] ..  args["to"])
+
+  _lua2c['setSignalValueWrap'](source, event)
 end
 
 -- Display receive arguments and echo them to caller

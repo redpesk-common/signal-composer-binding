@@ -313,7 +313,7 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 	if(ctlConfig_ && ctlConfig_->requireJ)
 	{
 		const char* requireS = json_object_to_json_string(ctlConfig_->requireJ);
-		if(!strcasestr(requireS, api))
+		if(!strcasestr(requireS, api) && !strcasestr(api, afbBindingV2.api))
 			{AFB_WARNING("Caution! You don't specify the API source as required in the metadata section. This API '%s' may not be initialized", api);}
 	}
 

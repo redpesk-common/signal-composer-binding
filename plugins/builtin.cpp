@@ -36,7 +36,6 @@ CTLP_CAPI (defaultOnReceived, source, argsJ, eventJ)
 	AFB_NOTICE("source: %s argj: %s, eventJ %s", source->uid,
 		json_object_to_json_string(argsJ),
 		json_object_to_json_string(eventJ));
-	void* sig = ctx->aSignal;
 
 	json_object* valueJ = nullptr;
 	json_object* timestampJ = nullptr;
@@ -48,7 +47,7 @@ CTLP_CAPI (defaultOnReceived, source, argsJ, eventJ)
 		{timestamp = json_object_get_int64(timestampJ);}
 
 	struct signalValue v = value;
-	ctx->setSignalValue(sig, timestamp, v);
+	ctx->setSignalValue(ctx->aSignal, timestamp, v);
 	return 0;
 }
 

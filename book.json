@@ -1,12 +1,12 @@
 {
     "title": "Signal Composer high level service",
     "subtitle": "Developer Documentation",
-    "description": "Signal composer let you compose and expose signals issued low level service",
+    "description": "Signal composer let you compose and expose signals issued low level services",
     "keywords": "AGL, Development, Iotbzh",
     "author": "IoT.Bzh Team",
     "website": "http://iot.bzh",
     "published": "December 2017",
-    "version": "4.99-EERC4",
+    "version": "4.99-EERC5",
 
     "gitbook": "3.2.2",
     "root": "docs",

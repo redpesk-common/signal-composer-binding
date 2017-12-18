@@ -19,6 +19,22 @@ ON-EVENT signal-composer/257b343e-8ea9-4cd7-8f9e-1904fa77f8f2({"event":"signal-c
 Unsubscribe happens the same way. When no more signals are holded by the client
 then it unsubscribe from the *AGL Application Framework* event handle.
 
+## addObjects
+
+Let you add sources or signals objects to the signal composer service after
+its initialization phase. Use this verb and specify the file as argument, you
+could use only the file name or the file name with its absolute path.
+
+```json
+signal-composer addObjects {"file": "sig_doors.json"}
+ON-REPLY 1:signal-composer/addObjects: {"jtype":"afb-reply","request":{"status":"success","uuid":"00d7a519-816e-486a-8163-3afb1face4fa"}}
+signal-composer addObjects {"file": "/tmp/sig_doors.json"}
+ON-REPLY 2:signal-composer/addObjects: {"jtype":"afb-reply","request":{"status":"success"}}
+```
+
+You can follow the activity using the service log journal and check that the
+correct number of objects has been added.
+
 ## get
 
 You can get a signal value be requesting the API with the verb *get*:

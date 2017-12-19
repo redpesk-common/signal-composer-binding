@@ -203,21 +203,6 @@ CtlActionT* Composer::convert2Action(const std::string& name, json_object* actio
 		{
 			ctlActionJ = buildPluginAction(name, function, functionArgsJ);
 		}
-		else if(startsWith(function, "builtin://"))
-		{
-			std::string uri = std::string(function).substr(10);
-			std::vector<std::string> uriV = Composer::parseURI(uri);
-			if(uriV.size() > 1) {AFB_WARNING("Too many thing specified. Uri has to be like: builtin://<builtin-function-name>");}
-
-			json_object *callbackJ = nullptr;
-			wrap_json_pack(&callbackJ, "{ss,ss,so*}",
-				"plugin", "builtin",
-				"function", uriV[0].c_str(),
-				"args", functionArgsJ);
-			wrap_json_pack(&ctlActionJ, "{ss,so}",
-				"uid", name.c_str(),
-				"callback", callbackJ);
-		}
 		else
 		{
 			AFB_ERROR("Wrong function uri specified. You have to specified 'lua://', 'plugin://' or 'api://'. (%s)", function);
@@ -237,7 +222,7 @@ CtlActionT* Composer::convert2Action(const std::string& name, json_object* actio
 	return nullptr;
 }
 
-/// @brief Add the builtin plugin in the default plugins section definition
+/// @brief Load controller plugins
 ///
 /// @param[in] section - Control Section structure
 /// @param[in] pluginsJ - JSON object containing all plugins definition made in
@@ -246,31 +231,7 @@ CtlActionT* Composer::convert2Action(const std::string& name, json_object* actio
 /// @return 0 if OK, other if not.
 int Composer::pluginsLoad(AFB_ApiT apiHandle, CtlSectionT *section, json_object *pluginsJ)
 {
-	json_object* builtinJ = nullptr, * completePluginsJ = nullptr;
-
-	if(pluginsJ)
-	{
-		wrap_json_pack(&builtinJ, "{ss,ss,ss,ss,s[s]}",
-			"uid", "builtin",
-			"ldpath", CONTROL_PLUGIN_PATH,
-			"info", "Builtin routine for onReceived or getSignals routines",
-			"basename", "builtin",
-			"lua2c", "setSignalValueWrap");
-
-		if (json_object_get_type(pluginsJ) == json_type_array)
-		{
-				json_object_array_add(pluginsJ, builtinJ);
-				completePluginsJ = pluginsJ;
-		}
-		else
-		{
-			completePluginsJ = json_object_new_array();
-			json_object_array_add(completePluginsJ, pluginsJ);
-			json_object_array_add(completePluginsJ, builtinJ);
-		}
-	}
-
-	return PluginConfig(nullptr, section, completePluginsJ);
+	return PluginConfig(nullptr, section, pluginsJ);
 }
 
 int Composer::loadOneSourceAPI(json_object* sourceJ)
@@ -623,14 +584,16 @@ std::vector<std::string> Composer::parseURI(const std::string& uri)
 	return uriV;
 }
 
-int Composer::loadConfig(const std::string& filepath)
+int Composer::loadConfig(std::string& filepath)
 {
 	const char *dirList= getenv("CONTROL_CONFIG_PATH");
 	if (!dirList) dirList=CONTROL_CONFIG_PATH;
-	const char *configPath = CtlConfigSearch (nullptr, dirList, "control-");
+	filepath.append(":");
+	filepath.append(dirList);
+	const char *configPath = CtlConfigSearch(nullptr, filepath.c_str(), "control-");
 
 	if (!configPath) {
-		AFB_ApiError(apiHandle, "CtlPreInit: No control-* config found invalid JSON %s ", dirList);
+		AFB_ApiError(apiHandle, "CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
 		return -1;
 	}
 

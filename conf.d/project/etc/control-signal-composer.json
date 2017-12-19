@@ -10,15 +10,19 @@
 	"plugins": [
 		{
 			"uid": "low-can-callbacks",
-			"ldpath": "lib/plugins",
 			"info": "Manage interaction with low-can service",
 			"basename": "low-can"
 		},
 		{
 			"uid": "gps-callbacks",
-			"ldpath": "lib/plugins",
 			"info": "Manage interaction with gps service",
 			"basename": "gps"
+		},
+		{
+			"uid": "builtin",
+			"info": "Builtin routine for onReceived or getSignals routines",
+			"basename": "builtin",
+			"lua2c": "setSignalValueWrap"
 		}
 	],
 	"signals": {

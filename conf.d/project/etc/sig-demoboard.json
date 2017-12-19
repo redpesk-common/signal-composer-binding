@@ -26,7 +26,7 @@
 			"unit": "rpm",
 			"frequency": 1,
 			"onReceived": {
-				"function": "builtin://defaultOnReceived"
+				"function": "plugin://defaultOnReceived"
 			}
 		},
 		{

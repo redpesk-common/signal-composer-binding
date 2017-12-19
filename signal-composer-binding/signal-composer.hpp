@@ -55,7 +55,7 @@ public:
 	static void* createContext(void* ctx);
 	static void destroyContext(void* ctx);
 	static std::vector<std::string> parseURI(const std::string& uri);
-	int loadConfig(const std::string& filepath);
+	int loadConfig(std::string& filepath);
 	int loadSources(json_object* sourcesJ);
 	int loadSignals(json_object* signalsJ);
 	void initSignals();

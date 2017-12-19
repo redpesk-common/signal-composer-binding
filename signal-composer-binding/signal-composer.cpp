@@ -93,8 +93,8 @@ Composer::~Composer()
 	{
 		json_object_put(j);
 	}
-	json_object_put(ctlConfig_->configJ);
-	json_object_put(ctlConfig_->requireJ);
+	if (ctlConfig_->configJ) json_object_put(ctlConfig_->configJ);
+	if (ctlConfig_->requireJ)json_object_put(ctlConfig_->requireJ);
 	free(ctlConfig_);
 }
 

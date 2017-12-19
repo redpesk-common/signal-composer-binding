@@ -75,14 +75,6 @@ function _Simple_Echo_Args (source, args, event)
     print ("--inlua-- source=", Dump_Table(source))
     print ("--inlua-- args=", Dump_Table(args))
     print ("--inlua-- event=", Dump_Table(event))
-
-    local response={
-       ["count"]=_count,
-       ["args"]=args,
-    }
-
-    -- fulup Embdeded table ToeDone AFB:success (request, response)
-    -- AFB:success (request, response)
 end
 
 local function Test_Async_CB (request, result, context)

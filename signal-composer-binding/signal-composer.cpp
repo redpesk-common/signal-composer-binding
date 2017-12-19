@@ -481,7 +481,6 @@ int Composer::loadOneSignal(json_object* signalJ)
 			// Overwrite uid to the signal one instead of the default
 			if(onReceivedCtl)
 				{onReceivedCtl->uid = uid;}
-		int count = 1;
 	}
 	else {onReceivedCtl = convert2Action(uid, onReceivedJ);}
 

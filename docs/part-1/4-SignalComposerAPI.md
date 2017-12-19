@@ -35,6 +35,9 @@ ON-REPLY 2:signal-composer/addObjects: {"jtype":"afb-reply","request":{"status":
 You can follow the activity using the service log journal and check that the
 correct number of objects has been added.
 
+> **CAUTION**: You need to get the following permission to be able to load new
+objects : `urn:AGL:permission::platform:composer:addObjects`
+
 ## get
 
 You can get a signal value be requesting the API with the verb *get*:

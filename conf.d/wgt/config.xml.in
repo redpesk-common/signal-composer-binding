@@ -17,6 +17,11 @@
 	</feature>
 
 	<feature name="urn:AGL:widget:required-api">
-		<param name="afb/afb-signal-composer.so" value="local" />
+		<param name="lib/afb-signal-composer.so" value="local" />
+	</feature>
+
+	<feature name="urn:AGL:widget:file-properties">
+		<param name="bin/lua" value="executable" />
+		<param name="bin/luac" value="executable" />
 	</feature>
 </widget>

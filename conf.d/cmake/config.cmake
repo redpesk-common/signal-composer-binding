@@ -84,7 +84,7 @@ set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 # Customize link option
 # -----------------------------
 #list(APPEND link_libraries -an-option)
-list(APPEND link_libraries afb-utilities lua-lib)
+list(APPEND link_libraries afb-utilities)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language

@@ -89,9 +89,11 @@ Composer::Composer()
 
 Composer::~Composer()
 {
+	// This will free onReceived_ action member from signal objects
+	// Not the best to have it occurs here instead of in Signal destructor
 	for(auto& j: ctlActionsJ_)
 	{
-		json_object_put(j);
+		if(j) json_object_put(j);
 	}
 	if (ctlConfig_->configJ) json_object_put(ctlConfig_->configJ);
 	if (ctlConfig_->requireJ)json_object_put(ctlConfig_->requireJ);
@@ -543,8 +545,9 @@ void Composer::processOptions(const std::map<std::string, int>& opts, std::share
 
 Composer& Composer::instance()
 {
-	static Composer composer;
-	return composer;
+	static Composer* composer;
+	if(!composer) composer = new Composer();
+	return *composer;
 }
 
 void* Composer::createContext(void* ctx)

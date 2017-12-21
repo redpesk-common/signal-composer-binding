@@ -6,7 +6,7 @@
     "author": "IoT.Bzh Team",
     "website": "http://iot.bzh",
     "published": "December 2017",
-    "version": "4.99-EERC5",
+    "version": "5.0",
 
     "gitbook": "3.2.2",
     "root": "docs",

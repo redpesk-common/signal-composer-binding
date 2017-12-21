@@ -75,9 +75,8 @@ Signal::Signal(const std::string& id,
 
 Signal::~Signal()
 {
-	json_object_put(onReceived_->argsJ);
-	json_object_put(getSignalsArgs_);
-	delete(onReceived_);
+	if(getSignalsArgs_) json_object_put(getSignalsArgs_);
+	if(onReceived_) delete(onReceived_);
 }
 
 Signal::operator bool() const

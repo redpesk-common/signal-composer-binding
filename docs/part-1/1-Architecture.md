@@ -8,19 +8,19 @@ Here is a quick picture about the signaling architecture :
 
 Key here are on both layers, **low** and **high**.
 
-- **Low levels** are in charge of handling data exchange protocol to
- decode/encode and retransmit with an AGL compatible format, most convenient
- way using **Application Framework** events. These are divided into two parts,
- which are :
-  - Transport Layer plug-in that is able to read/write a protocol.
-  - Decoding/Encoding part that exposes signals and a way to access them.
-- **High level signal composer** gathers multiple **low level** signaling
- sources and creates new virtuals signals from the **raw** signals defined (eg.
- signal made from gps latitude and longitude that computes the heading of
- vehicle). It is modular and each signal source should be handled by specific
+- **Low levels** binding used as _AGL service_, handle data exchange protocol to
+ decode/encode and retransmit with an AGL compatible format using **Application
+ Framework** events. These are divided into two parts, which are :
+  - A transport Layer binding's plug-in that is able to read/write a from a device.
+  - Decoding/Encoding parts that expose signals.
+- **High level signal composer** binding gathers multiple **low level** signaling
+ sources. Then from these sources, it exposes theirs **raw** signals or more interesting
+ can creates new virtuals signals from them. Example:
+ A signal made from gps latitude and longitude that computes the heading of
+ vehicle. This is modular and each signal source should be handled by specific
  plugins which take care of get the underlying event from **low level** or
  define signaling composition with simple or complex operation to output value
- from **raw** signals
+ from **raw** signals.
 
 A transport plug-in is a shared library that shares a common API to be
 compatible with **low level** services that is:

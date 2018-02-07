@@ -61,11 +61,3 @@ binding, by default **last** is used:
 
 Verb **list** will output the list of defined signals.
 
-## loadConf
-
-Verb **loadConf** let you add new files to be able to add new **sources** or
-**signals**.
-
-```json
-signal-composer loadConf {"file": "/path/to/your/json/file.json"}
-```

@@ -37,16 +37,19 @@ void clientAppCtx::appendSignals(std::vector<std::shared_ptr<Signal>>& sigV)
 	for (std::vector<std::shared_ptr<Signal>>::const_iterator it = sigV.cbegin();
 	it != sigV.cend(); ++it)
 	{
+		std::shared_ptr<Signal> sig = nullptr;
 		for (auto& ctxSig: subscribedSignals_)
 			{if(*it == ctxSig) {set = true;}}
 		if (set)
 		{
 			set = false;
 			sigV.erase(it);
-			continue;
 		}
-		std::shared_ptr<Signal> sig = *it;
-		sig->addObserver(this);
+		else
+		{
+			std::shared_ptr<Signal> sig = *it;
+			sig->addObserver(this);
+		}
 	}
 
 	subscribedSignals_.insert(subscribedSignals_.end(), sigV.begin(), sigV.end());

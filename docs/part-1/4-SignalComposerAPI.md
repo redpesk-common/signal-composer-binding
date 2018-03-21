@@ -60,4 +60,3 @@ binding, by default **last** is used:
 ## list
 
 Verb **list** will output the list of defined signals.
-

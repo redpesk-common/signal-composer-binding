@@ -148,19 +148,20 @@ json_object* Composer::buildLuaAction(std::string name, std::string function, js
 	std::string fName, filepath;
 	std::string uri = std::string(function).substr(6);
 	std::vector<std::string> uriV = Composer::parseURI(uri);
-	if(uriV.size() > 2)
+	uriVsize = uriV.size();
+	if(uriVsize > 2)
 	{
 		int i = 0;
-		while(i < uriV.size()-1)
+		while(i < uriVsize-1)
 			{filepath += uriV[i] + "/";}
-		fName = uriV[-1];
+		fName = uriV[uriVsize-1];
 	}
-	else if(uriV.size() == 2)
+	else if(uriVsize == 2)
 	{
 		filepath = uriV[0];
 		fName = uriV[2];
 	}
-	else if(uriV.size() == 1)
+	else if(uriVsize == 1)
 		{fName = uriV[0];}
 	else
 	{

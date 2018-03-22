@@ -34,6 +34,7 @@ class Composer;
 ///  Not very efficient or optimized, maybe use of Variant in
 ///  C++17 but this is a bit too new to uses it for now
 struct signalValue {
+	bool undefined;
 	bool hasBool;
 	bool boolVal;
 	bool hasNum;
@@ -42,15 +43,15 @@ struct signalValue {
 	std::string strVal;
 
 	signalValue():
-		hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(false), strVal("") {};
+		undefined(true), hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(false), strVal("") {};
 	signalValue(bool b):
-		hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
+		undefined(false), hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
 	signalValue(int b):
-		hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
+		undefined(false), hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
 	signalValue(double d):
-		hasBool(false), boolVal(false), hasNum(true), numVal(d), hasStr(false), strVal("") {};
+		undefined(false), hasBool(false), boolVal(false), hasNum(true), numVal(d), hasStr(false), strVal("") {};
 	signalValue(const std::string& s):
-		hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(true), strVal(s) {};
+		undefined(false), hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(true), strVal(s) {};
 };
 
 extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, struct signalValue value);

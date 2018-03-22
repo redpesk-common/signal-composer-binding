@@ -148,7 +148,7 @@ json_object* Composer::buildLuaAction(std::string name, std::string function, js
 	std::string fName, filepath;
 	std::string uri = std::string(function).substr(6);
 	std::vector<std::string> uriV = Composer::parseURI(uri);
-	uriVsize = uriV.size();
+	std::size_t uriVsize = uriV.size();
 	if(uriVsize > 2)
 	{
 		int i = 0;
@@ -306,7 +306,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 
 	if(sourcesJ)
 	{
-		int count = 1;
+		std::size_t count = 1;
 		json_object *sigCompJ = nullptr;
 		// add the signal composer itself as source
 		wrap_json_pack(&sigCompJ, "{ss,ss,ss}",
@@ -333,7 +333,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 			if ((err = composer.loadOneSourceAPI(sourcesJ))) return err;
 			if (sigCompJ && (err = composer.loadOneSourceAPI(sigCompJ))) return err;
 		}
-		AFB_NOTICE("%d new sources added to service", count);
+		AFB_NOTICE("%ld new sources added to service", count);
 	}
 	else
 		{Composer::instance().initSourcesAPI();}
@@ -399,7 +399,7 @@ int Composer::loadOneSignal(json_object* signalJ)
 	{
 		if(json_object_get_type(dependsJ) == json_type_array)
 		{
-			int count = json_object_array_length(dependsJ);
+			std::size_t count = json_object_array_length(dependsJ);
 			for(int i = 0; i < count; i++)
 			{
 				std::string sourceStr = json_object_get_string(json_object_array_get_idx(dependsJ, i));
@@ -463,7 +463,7 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 
 	if(signalsJ)
 	{
-		int count = 1;
+		std::size_t count = 1;
 		if (json_object_get_type(signalsJ) == json_type_array)
 		{
 			count = json_object_array_length(signalsJ);
@@ -475,7 +475,7 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 		}
 		else
 			{err = composer.loadOneSignal(signalsJ);}
-		AFB_NOTICE("%d new signals added to service", count);
+		AFB_NOTICE("%ld new signals added to service", count);
 	}
 
 	return err;

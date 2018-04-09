@@ -168,31 +168,38 @@ void unsubscribe(afb_req request)
 }
 
 /// @brief verb that loads JSON configuration (old SigComp.json file now)
+
 void addObjects(afb_req request)
 {
 	Composer& composer = Composer::instance();
 	json_object *sourcesJ = nullptr,
-				*signalsJ = nullptr;
+				*signalsJ = nullptr,
+				*objectsJ = nullptr;
 	const char* filepath = afb_req_value(request, "file");
 
 	if(filepath)
 	{
-		json_object *fileJ = json_object_from_file(filepath);
-		if(!fileJ)
+		objectsJ = json_object_from_file(filepath);
+		if(!objectsJ)
 		{
 			json_object* responseJ = ScanForConfig(CONTROL_CONFIG_PATH, CTL_SCAN_RECURSIVE, filepath, ".json");
 			filepath = ConfigSearch(nullptr, responseJ);
 			if(filepath)
-				{fileJ = json_object_from_file(filepath);}
+				{objectsJ = json_object_from_file(filepath);}
 		}
+	}
+	else
+		{objectsJ = afb_req_json(request);}
 
-		json_object_object_get_ex(fileJ, "sources", &sourcesJ);
-		json_object_object_get_ex(fileJ, "signals", &signalsJ);
+	if(objectsJ)
+	{
+		json_object_object_get_ex(objectsJ, "sources", &sourcesJ);
+		json_object_object_get_ex(objectsJ, "signals", &signalsJ);
 
 		if( sourcesJ && composer.loadSources(sourcesJ))
 		{
 			afb_req_fail_f(request, "Loading 'sources' configuration or subscription error", "Error code: -2");
-			json_object_put(fileJ);
+			json_object_put(objectsJ);
 			return;
 		}
 		if(signalsJ)
@@ -202,11 +209,11 @@ void addObjects(afb_req request)
 			else
 			{
 				afb_req_fail_f(request, "Loading 'signals' configuration or subscription error", "Error code: -2");
-				json_object_put(fileJ);
+				json_object_put(objectsJ);
 				return;
 			}
 		}
-		json_object_put(fileJ);
+		json_object_put(objectsJ);
 		afb_req_success(request, NULL, NULL);
 	}
 	else

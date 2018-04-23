@@ -1,0 +1,103 @@
+{
+	"$schema": "http://iot.bzh/download/public/schema/json/signal-composer-schema.json",
+	"signals": [
+		{
+			"uid": "vehicle_speed",
+			"event": "txc/vehicle_speed",
+			"retention": 30,
+			"unit": "km/h",
+			"getSignalsArgs": {
+				"event": "vehicle_speed"
+			}
+		},
+		{
+			"uid": "engine_speed",
+			"event": "txc/engine_speed",
+			"retention": 30,
+			"unit": "rpm",
+			"getSignalsArgs": {
+				"event": "engine_speed"
+			}
+		},
+		{
+			"uid": "fuel_level",
+			"event": "txc/fuel_level",
+			"retention": 30,
+			"unit": "liter",
+			"getSignalsArgs": {
+				"event": "fuel_level"
+			}
+		},
+		{
+			"uid": "accelerator_pedal_position",
+			"event": "txc/accelerator_pedal_position",
+			"retention": 30,
+			"getSignalsArgs": {
+				"event": "accelerator_pedal_position"
+			}
+		},
+		{
+			"uid": "torque_at_transmission",
+			"event": "txc/torque_at_transmission",
+			"retention": 30,
+			"unit": "Nm",
+			"getSignalsArgs": {
+				"event": "torque_at_transmission"
+			}
+		},
+		{
+			"uid": "steering_wheel_angle",
+			"event": "txc/steering_wheel_angle",
+			"retention": 30,
+			"unit": "degrees",
+			"getSignalsArgs": {
+				"event": "steering_wheel_angle"
+			}
+		},
+		{
+			"uid": "fuel_consumed_since_restart",
+			"event": "txc/fuel_consumed_since_restart",
+			"retention": 30,
+			"unit": "liter",
+			"getSignalsArgs": {
+				"event": "fuel_consumed_since_restart"
+			}
+		},
+		{
+			"uid": "odometer",
+			"event": "txc/odometer",
+			"retention": 30,
+			"unit": "km",
+			"getSignalsArgs": {
+				"event": "odometer"
+			}
+		},
+		{
+			"uid": "latitude",
+			"event": "txc/latitude",
+			"retention": 30,
+			"unit": "degrees",
+			"getSignalsArgs": {
+				"event": "latitude"
+			}
+		},
+		{
+			"uid": "longitude",
+			"event": "txc/longitude",
+			"retention": 30,
+			"unit": "degrees",
+			"getSignalsArgs": {
+				"event": "longitude"
+			}
+		},
+		{
+			"uid": "heading",
+			"depends": ["longitude", "latitude"],
+			"retention": 30,
+			"unit": "degrees",
+			"onReceived": {
+				"function": "plugin://gps-callbacks/getHeading"
+			}
+		}
+	]
+}

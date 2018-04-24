@@ -295,7 +295,7 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 
 	onReceivedCtl = onReceivedJ ? convert2Action("onReceived", onReceivedJ) : nullptr;
 
-	sourcesListV_.push_back(std::make_shared<SourceAPI>(uid, api, info, initCtl, getSignalsCtl, onReceivedCtl, retention));
+	newSourcesListV_.push_back(std::make_shared<SourceAPI>(uid, api, info, initCtl, getSignalsCtl, onReceivedCtl, retention));
 	return err;
 }
 
@@ -421,7 +421,17 @@ int Composer::loadOneSignal(json_object* signalJ)
 			}
 			dependsV.push_back(sourceStr);
 		}
-		if(!src) {src=*sourcesListV_.rbegin();}
+		if(!src) {
+			if (!sourcesListV_.empty())
+				src = *sourcesListV_.rbegin();
+			else if (!newSourcesListV_.empty())
+				src = *newSourcesListV_.rbegin();
+			else
+			{
+				AFB_WARNING("Signal '%s' not correctly attached to its source. Abort this one", json_object_to_json_string(signalJ));
+				return -1;
+			}
+		}
 	}
 
 	// Set default retention if not specified
@@ -644,7 +654,8 @@ CtlConfigT* Composer::ctlConfig()
 
 void Composer::initSourcesAPI()
 {
-	for(int i=0; i < newSourcesListV_.size(); i++)
+	size_t toInitialize = newSourcesListV_.size();
+	for(int i=0; i < toInitialize; i++)
 	{
 		std::shared_ptr<SourceAPI> src = newSourcesListV_.back();
 		newSourcesListV_.pop_back();

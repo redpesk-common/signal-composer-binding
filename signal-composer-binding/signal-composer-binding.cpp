@@ -279,6 +279,7 @@ int execConf()
 	int err = 0;
 	CtlConfigExec(nullptr, composer.ctlConfig());
 
+	composer.initSourcesAPI();
 	composer.initSignals();
 
 	AFB_DEBUG("Signal Composer Control configuration Done.");

@@ -149,6 +149,7 @@ void SourceAPI::makeSubscription()
 		source.uid = api_.c_str();
 		source.api = nullptr; // We use binding v2, no dynamic API.
 		source.request = {nullptr, nullptr};
+		json_object *argsSaveJ = getSignals_->argsJ;
 
 		for(auto& sig: signalsM_)
 		{
@@ -162,15 +163,18 @@ void SourceAPI::makeSubscription()
 				}
 				source.uid = sig.first.c_str();
 				source.context = getSignals_->type == CTL_TYPE_CB ?
-					getSignals_->exec.cb.plugin->context:
+					getSignals_->exec.cb.plugin->context :
 					nullptr;
+				getSignals_->argsJ = sig.second->getSignalsArgs() ?
+					sig.second->getSignalsArgs() :
+					argsSaveJ;
 				ActionExecOne(&source, getSignals_, signalJ);
 				// Considerate signal subscribed no matter what
 				sig.second->subscribed_ = true;
-				json_object_put(signalJ);
 			}
 		}
-		source.uid = "";
+		getSignals_->argsJ = argsSaveJ;
+		source.uid = uid_.c_str();
 		ActionExecOne(&source, getSignals_, nullptr);
 	}
 }

@@ -103,6 +103,7 @@ public:
 	const std::string id() const;
 	json_object* toJSON() const;
 	struct signalCBT* get_context();
+	json_object *getSignalsArgs();
 
 	void set(uint64_t timestamp, struct signalValue& value);
 	void update(Signal* sig);

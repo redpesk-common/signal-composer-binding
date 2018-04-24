@@ -178,6 +178,14 @@ struct signalCBT* Signal::get_context()
 	return &signalCtx_;
 }
 
+/// @brief Accessor to getSignalsArgs_ json_object member
+///
+/// @return a pointer the json_object getSignalsArgs_ private member
+json_object *Signal::getSignalsArgs()
+{
+	return getSignalsArgs_;
+}
+
 /// @brief Set Signal timestamp and value property when an incoming
 /// signal arrived. Called by a plugin because treatment can't be
 /// standard as signals sources format could changes. See low-can plugin

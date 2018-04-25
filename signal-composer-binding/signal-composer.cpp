@@ -520,7 +520,7 @@ void Composer::processOptions(const std::map<std::string, int>& opts, std::share
 		else if (o.first.compare("last") && !last)
 		{
 			last = true;
-			struct signalValue value = sig->last();
+			struct signalValue value = sig->last_value();
 			if(value.hasBool)
 			{
 				json_object_object_add(response, "value",
@@ -744,7 +744,7 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 				"signal", sig->id().c_str());
 			if (opts.empty())
 			{
-				struct signalValue value = sig->last();
+				struct signalValue value = sig->last_value();
 				if(value.hasBool)
 				{
 					json_object_object_add(response, "value",

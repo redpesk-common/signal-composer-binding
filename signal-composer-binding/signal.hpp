@@ -115,7 +115,8 @@ public:
 	double average(int seconds = 0) const;
 	double minimum(int seconds = 0) const;
 	double maximum(int seconds = 0) const;
-	struct signalValue last() const;
+	struct signalValue last_value() const;
+	uint64_t last_timestamp() const;
 
 	int initialRecursionCheck();
 	int recursionCheck(Signal* obs);

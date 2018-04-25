@@ -25,9 +25,13 @@ clientAppCtx::clientAppCtx(const char* uuid)
 void clientAppCtx::update(Signal* sig)
 {
 	json_object* sigJ = sig->toJSON();
-	if(afb_event_push(event_, sigJ) == 0)
-		{sig->delObserver(this);}
-	return;
+
+	if(afb_event_is_valid(event_)) {
+		if(!afb_event_push(event_, sigJ))
+			{sig->delObserver(this);}
+	}
+	else
+		{json_object_put(sigJ);}
 }
 
 void clientAppCtx::appendSignals(std::vector<std::shared_ptr<Signal>>& sigV)

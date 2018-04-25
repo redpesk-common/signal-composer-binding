@@ -17,6 +17,7 @@
 
 #include <float.h>
 #include <string.h>
+#include <fnmatch.h>
 
 #include "signal.hpp"
 #include "signal-composer.hpp"
@@ -94,8 +95,10 @@ bool Signal::operator ==(const Signal& other) const
 
 bool Signal::operator ==(const std::string& aName) const
 {
-	if(id_.find(aName)    != std::string::npos) {return true;}
-	if(event_.find(aName) != std::string::npos) {return true;}
+	if(! ::fnmatch(aName.c_str(), id_.c_str(), FNM_CASEFOLD))
+		{return true;}
+	if(! ::fnmatch(aName.c_str(), event_.c_str(), FNM_CASEFOLD))
+		{return true;}
 
 	return false;
 }
@@ -129,6 +132,7 @@ json_object* Signal::toJSON() const
 	wrap_json_pack(&queryJ, "{ss,so*}",
 			"uid", id_.c_str(),
 			"getSignalsArgs", getSignalsArgs_);
+	AFB_ApiDebug(nullptr, "========== %s", json_object_get_string(queryJ));
 
 	if (!event_.empty())
 		{json_object_object_add(queryJ, "event", json_object_new_string(event_.c_str()));}
@@ -230,10 +234,11 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 	json_object_iterator iterEnd = json_object_iter_end(eventJ);
 	while(!json_object_iter_equal(&iter, &iterEnd))
 	{
-		std::string name = json_object_iter_peek_name(&iter);
-		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+		std::string key = json_object_iter_peek_name(&iter);
+		std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 		json_object *value = json_object_iter_peek_value(&iter);
-		if (name.find("value") || name.find(id_))
+		if (key.find("value") != std::string::npos ||
+			key.find(id_) != std::string::npos)
 		{
 			if(json_object_is_type(value, json_type_double))
 				{sv = json_object_get_double(value);}
@@ -242,7 +247,7 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 			else if(json_object_is_type(value, json_type_string))
 				{sv = json_object_get_string(value);}
 		}
-		else if (name.find("timestamp"))
+		else if (key.find("timestamp") != std::string::npos)
 		{
 			ts = json_object_is_type(value, json_type_int) ? json_object_get_int64(value):ts;
 		}
@@ -256,9 +261,10 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 	}
 	else if(ts == 0)
 	{
-		struct timespec t_usec;
-		if(!::clock_gettime(CLOCK_MONOTONIC, &t_usec))
-			ts = (t_usec.tv_nsec / 1000ll) + (t_usec.tv_sec* 1000000ll);
+		struct timespec t;
+
+		if(!::clock_gettime(CLOCK_REALTIME, &t))
+			ts = (uint64_t)(t.tv_sec) * (uint64_t)1000000 + ((uint64_t)(t.tv_nsec) / 1000);
 	}
 
 	set(ts, sv);
@@ -426,12 +432,17 @@ double Signal::maximum(int seconds) const
 /// @brief Return last value recorded
 ///
 /// @return Last value
-struct signalValue Signal::last() const
+struct signalValue Signal::last_value() const
 {
 	if(history_.empty()) {return signalValue();}
 	return history_.rbegin()->second;
 }
 
+uint64_t Signal::last_timestamp() const
+{
+	if(history_.empty()) {return 0;}
+	return history_.rbegin()->first;
+}
 
 /// @brief Recursion check to ensure that there is no infinite loop
 /// in the Observers/Observables structure.

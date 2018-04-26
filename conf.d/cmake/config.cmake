@@ -19,10 +19,10 @@
 # Project Info
 # ------------------
 set(PROJECT_NAME signal-composer)
-set(PROJECT_VERSION "4.0")
+set(PROJECT_VERSION "5.0")
 set(PROJECT_PRETTY_NAME "Signal composer")
 set(PROJECT_DESCRIPTION "Signal composer API connected to low level AGL services")
-set(PROJECT_URL "https://github.com/iotbzh/afb-signal-composer")
+set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/#/admin/projects/apps/agl-service-signal-composer")
 set(PROJECT_ICON "icon.png")
 set(PROJECT_AUTHOR "Forlot Romain")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
@@ -84,7 +84,7 @@ set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 # Customize link option
 # -----------------------------
 #list(APPEND link_libraries -an-option)
-list(APPEND link_libraries afb-utilities)
+list(APPEND link_libraries afb-helpers)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language

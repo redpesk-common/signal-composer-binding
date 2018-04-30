@@ -98,7 +98,9 @@ public:
 
 	explicit operator bool() const;
 	bool operator==(const Signal& other) const;
+	bool operator!=(const Signal& other) const;
 	bool operator==(const std::string& aName) const;
+	bool operator!=(const std::string& aName) const;
 
 	const std::string id() const;
 	json_object* toJSON() const;

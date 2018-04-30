@@ -93,11 +93,25 @@ bool Signal::operator ==(const Signal& other) const
 	return false;
 }
 
+bool Signal::operator !=(const Signal& other) const
+{
+	if(id_ != other.id_) {return true;}
+	return false;
+}
+
 bool Signal::operator ==(const std::string& aName) const
 {
-	if(! ::fnmatch(aName.c_str(), id_.c_str(), FNM_CASEFOLD))
+	if(! ::fnmatch(aName.c_str(), id_.c_str(), FNM_CASEFOLD) ||
+	   ! ::fnmatch(aName.c_str(), event_.c_str(), FNM_CASEFOLD))
 		{return true;}
-	if(! ::fnmatch(aName.c_str(), event_.c_str(), FNM_CASEFOLD))
+
+	return false;
+}
+
+bool Signal::operator !=(const std::string& aName) const
+{
+	if(::fnmatch(aName.c_str(), id_.c_str(), FNM_CASEFOLD) &&
+	   ::fnmatch(aName.c_str(), event_.c_str(), FNM_CASEFOLD))
 		{return true;}
 
 	return false;
@@ -207,18 +221,44 @@ void Signal::set(uint64_t timestamp, struct signalValue& value)
 	while(diff > retention_)
 	{
 		uint64_t first = history_.begin()->first;
-		diff = (timestamp_ - first)/MICRO;
+		diff = (timestamp_ - first)/NANO;
 		if(diff > retention_)
 			{history_.erase(history_.cbegin());}
 	}
+
+	notify();
 }
 
-/// @brief Observer method called when a Observable Signal has changes.
+/// @brief Observer method called when an Observable Signal has changed.
+///  this will call the onReceived callback with a JSONinifed object of observed
+///  signals.
+///
+///  The signal which triggered the update action will be provided as the last
+///  element.
 ///
 /// @param[in] Observable - object from which update come from
 void Signal::update(Signal* sig)
 {
-	AFB_NOTICE("Got an update from observed signal %s", sig->id().c_str());
+	json_object *depSigJ = json_object_new_array();
+	CtlSourceT src = {
+		.uid = sig->id().c_str(),
+		.api = nullptr,
+		.request = {nullptr, nullptr},
+		.context = (void*)get_context(),
+		.status = CTL_STATUS_EVT};
+	Composer& composer = Composer::instance();
+
+	for(const std::string& depSignal : dependsSigV_)
+	{
+		if(*sig != depSignal) {
+			std::vector<std::shared_ptr<Signal>> vs = composer.searchSignals(depSignal);
+			for(const auto& s : vs)
+				json_object_array_add(depSigJ, s->toJSON());
+		}
+	}
+	json_object_array_add(depSigJ, sig->toJSON());
+
+	ActionExecOne(&src, onReceived_, depSigJ);
 }
 
 /// @brief

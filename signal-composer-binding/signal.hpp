@@ -46,8 +46,8 @@ struct signalValue {
 		undefined(true), hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(false), strVal("") {};
 	signalValue(bool b):
 		undefined(false), hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
-	signalValue(int b):
-		undefined(false), hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
+	signalValue(int i):
+		undefined(false), hasBool(false), boolVal(false), hasNum(true), numVal(i), hasStr(false), strVal("") {};
 	signalValue(double d):
 		undefined(false), hasBool(false), boolVal(false), hasNum(true), numVal(d), hasStr(false), strVal("") {};
 	signalValue(const std::string& s):

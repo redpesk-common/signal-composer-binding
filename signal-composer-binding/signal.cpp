@@ -485,14 +485,12 @@ double Signal::maximum(int seconds) const
 /// @return Last value
 struct signalValue Signal::last_value() const
 {
-	if(history_.empty()) {return signalValue();}
-	return history_.rbegin()->second;
+	return value_;
 }
 
 uint64_t Signal::last_timestamp() const
 {
-	if(history_.empty()) {return 0;}
-	return history_.rbegin()->first;
+	return timestamp_;
 }
 
 /// @brief Recursion check to ensure that there is no infinite loop

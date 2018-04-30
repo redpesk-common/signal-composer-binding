@@ -353,7 +353,6 @@ void Signal::onReceivedCB(json_object *eventJ)
 	source.request = {nullptr, nullptr};
 	source.context = (void*)get_context();
 	onReceived_ ? ActionExecOne(&source, onReceived_, eventJ) : defaultReceivedCB(eventJ);
-	notify();
 }
 
 /// @brief Make a Signal observer observes Signals observables

@@ -281,16 +281,25 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 		if (key.find("value") != std::string::npos ||
 			key.find(id_) != std::string::npos)
 		{
-			if(json_object_is_type(value, json_type_double))
-				{sv = json_object_get_double(value);}
-			else if(json_object_is_type(value, json_type_boolean))
-				{sv = json_object_get_int(value);}
-			else if(json_object_is_type(value, json_type_string))
-				{sv = json_object_get_string(value);}
+			switch(json_object_get_type(value)) {
+				case json_type_double: {
+					sv = json_object_get_double(value);
+					break;
+				}
+				case json_type_boolean: {
+					sv = json_object_get_int(value);
+					break;
+				}
+				case json_type_string: {
+					sv = json_object_get_string(value);
+					break;
+				}
+			}
 		}
 		else if (key.find("timestamp") != std::string::npos)
 		{
 			ts = json_object_is_type(value, json_type_int) ? json_object_get_int64(value):ts;
+			ts = json_object_is_type(value, json_type_double) ? (uint64_t)json_object_get_double(value) * NANO : ts;
 		}
 		json_object_iter_next(&iter);
 	}
@@ -305,7 +314,7 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 		struct timespec t;
 
 		if(!::clock_gettime(CLOCK_REALTIME, &t))
-			ts = (uint64_t)(t.tv_sec) * (uint64_t)1000000 + ((uint64_t)(t.tv_nsec) / 1000);
+			ts = (uint64_t)(t.tv_sec) * (uint64_t)NANO + (uint64_t)(t.tv_nsec);
 	}
 
 	set(ts, sv);
@@ -329,7 +338,7 @@ void Signal::onReceivedCB(json_object *eventJ)
 			if(json_object_is_type(value, json_type_int))
 			{
 				int64_t newVal = json_object_get_int64(value);
-				newVal = newVal > USEC_TIMESTAMP_FLAG ? newVal/MICRO:newVal;
+				newVal = newVal > USEC_TIMESTAMP_FLAG ? newVal/NANO:newVal;
 				json_object_object_del(eventJ, name);
 				json_object* luaVal = json_object_new_int64(newVal);
 				json_object_object_add(eventJ, name, luaVal);
@@ -378,7 +387,7 @@ double Signal::average(int seconds) const
 {
 	uint64_t begin = history_.begin()->first;
 	uint64_t end = seconds ?
-		begin+(seconds*MICRO) :
+		begin+(seconds*NANO) :
 		history_.rbegin()->first;
 	double total = 0.0;
 	int nbElt = 0;
@@ -415,7 +424,7 @@ double Signal::minimum(int seconds) const
 {
 	uint64_t begin = history_.begin()->first;
 	uint64_t end = seconds ?
-	begin+(seconds*MICRO) :
+	begin+(seconds*NANO) :
 	history_.rbegin()->first;
 
 	double min = DBL_MAX;
@@ -447,7 +456,7 @@ double Signal::maximum(int seconds) const
 {
 	uint64_t begin = history_.begin()->first;
 	uint64_t end = seconds ?
-	begin+(seconds*MICRO) :
+	begin+(seconds*NANO) :
 	history_.rbegin()->first;
 
 	double max = 0.0;

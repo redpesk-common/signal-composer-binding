@@ -24,7 +24,7 @@
 
 #include "observer-pattern.hpp"
 
-#define MICRO 1000000
+#define NANO 1000000000
 
 class Composer;
 

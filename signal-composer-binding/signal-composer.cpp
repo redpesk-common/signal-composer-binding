@@ -37,22 +37,6 @@ extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, struct s
 	sig->set(timestamp, value);
 }
 
-bool startsWith(const std::string& str, const std::string& pattern)
-{
-	size_t sep;
-	if( (sep = str.find(pattern)) != std::string::npos && !sep)
-		{return true;}
-	return false;
-}
-
-void extractString(void* closure, json_object* object)
-{
-	std::vector<std::string> *files = (std::vector<std::string>*) closure;
-	const char *oneFile = json_object_get_string(object);
-
-	files->push_back(oneFile);
-}
-
 // aSignal member value will be initialized in sourceAPI->addSignal()
 static struct signalCBT pluginHandle = {
 	.searchNsetSignalValue = searchNsetSignalValueHandle,
@@ -100,128 +84,15 @@ Composer::~Composer()
 	free(ctlConfig_);
 }
 
-json_object* Composer::buildPluginAction(std::string name, std::string function, json_object* functionArgsJ)
-{
-	json_object *callbackJ = nullptr, *ctlActionJ = nullptr;
-	std::string uri = std::string(function).substr(9);
-	std::vector<std::string> uriV = Composer::parseURI(uri);
-	if(uriV.size() != 2)
-	{
-		AFB_ERROR("Miss something in uri either plugin name or function name. Uri has to be like: plugin://<plugin-name>/<function-name>");
-		return nullptr;
-	}
-	wrap_json_pack(&callbackJ, "{ss,ss,so*}",
-		"plugin", uriV[0].c_str(),
-		"function", uriV[1].c_str(),
-		"args", functionArgsJ);
-	wrap_json_pack(&ctlActionJ, "{ss,so}",
-		"uid", name.c_str(),
-		"callback", callbackJ);
-
-	return ctlActionJ;
-}
-
-json_object* Composer::buildApiAction(std::string name, std::string function, json_object* functionArgsJ)
-{
-	json_object *subcallJ = nullptr, *ctlActionJ = nullptr;
-	std::string uri = std::string(function).substr(6);
-	std::vector<std::string> uriV = Composer::parseURI(uri);
-	if(uriV.size() != 2)
-	{
-		AFB_ERROR("Miss something in uri either plugin name or function name. Uri has to be like: api://<plugin-name>/<function-name>");
-		return nullptr;
-	}
-	wrap_json_pack(&subcallJ, "{ss,ss}",
-		"api", uriV[0].c_str(),
-		"verb", uriV[1].c_str());
-	wrap_json_pack(&ctlActionJ, "{ss,so,so*}",
-		"uid", name.c_str(),
-		"subcall", subcallJ,
-		"args", functionArgsJ);
-
-	return ctlActionJ;
-}
-
-json_object* Composer::buildLuaAction(std::string name, std::string function, json_object* functionArgsJ)
-{
-	json_object *luaJ = nullptr, *ctlActionJ = nullptr;
-	std::string fName, filepath;
-	std::string uri = std::string(function).substr(6);
-	std::vector<std::string> uriV = Composer::parseURI(uri);
-	std::size_t uriVsize = uriV.size();
-	if(uriVsize > 2)
-	{
-		int i = 0;
-		while(i < uriVsize-1)
-			{filepath += uriV[i] + "/";}
-		fName = uriV[uriVsize-1];
-	}
-	else if(uriVsize == 2)
-	{
-		filepath = uriV[0];
-		fName = uriV[2];
-	}
-	else if(uriVsize == 1)
-		{fName = uriV[0];}
-	else
-	{
-		AFB_ERROR("Missing something in uri either lua filepath or function name. Uri has to be like: lua://file/path/file.lua/function_name with filepath optionnal. If not specified, search will be done in default directories");
-		return nullptr;
-	}
-
-	wrap_json_pack(&luaJ, "{ss*,ss}",
-		"load", filepath.empty() ? NULL:filepath.c_str(),
-		"func", fName.c_str());
-	wrap_json_pack(&ctlActionJ, "{ss,so,so*}",
-		"uid", name.c_str(),
-		"lua", luaJ,
-		"args", functionArgsJ);
-
-	return ctlActionJ;
-}
-
 CtlActionT* Composer::convert2Action(const std::string& name, json_object* actionJ)
 {
-	json_object *functionArgsJ = nullptr,
-				*ctlActionJ = nullptr;
-	char *function;
-	const char *plugin;
 	CtlActionT *ctlAction = new CtlActionT;
-	memset(ctlAction, 0, sizeof(CtlActionT));
 
-	if(actionJ &&
-		!wrap_json_unpack(actionJ, "{ss,s?s,s?o !}", "function", &function,
-			"plugin", &plugin,
-			"args", &functionArgsJ))
-	{
-		if(startsWith(function, "lua://"))
-		{
-			ctlActionJ = buildLuaAction(name, function, functionArgsJ);
-		}
-		else if(startsWith(function, "api://"))
-		{
-			ctlActionJ = buildApiAction(name, function, functionArgsJ);
-		}
-		else if(startsWith(function, "plugin://"))
-		{
-			ctlActionJ = buildPluginAction(name, function, functionArgsJ);
-		}
-		else
-		{
-			AFB_ERROR("Wrong function uri specified. You have to specified 'lua://', 'plugin://' or 'api://'. (%s)", function);
-			return nullptr;
-		}
-	}
+	json_object_object_add(actionJ, "uid", json_object_new_string(name.c_str()));
+	if(! ActionLoadOne(nullptr, ctlAction, actionJ, 0))
+		{return ctlAction;}
 
-	// Register json object for later release
-	ctlActionsJ_.push_back(ctlActionJ);
-	if(ctlActionJ)
-	{
-		int err = ActionLoadOne(nullptr, ctlAction, ctlActionJ, 0);
-		if(! err)
-			{return ctlAction;}
-	}
-
+	delete(ctlAction);
 	return nullptr;
 }
 
@@ -286,10 +157,9 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 	// defined.
 	if(!getSignalsJ)
 	{
+		getSignalsJ = json_object_new_object();
 		std::string function = "api://" + std::string(api) + "/subscribe";
-		getSignalsJ = buildApiAction("getSignals", function, nullptr);
-		// Register json object for later release
-		ctlActionsJ_.push_back(getSignalsJ);
+		json_object_object_add(getSignalsJ, "function", json_object_new_string(function.c_str()));
 	}
 	getSignalsCtl = convert2Action("getSignals", getSignalsJ);
 
@@ -389,6 +259,11 @@ int Composer::loadOneSignal(json_object* signalJ)
 		}
 		std::string api = eventStr.substr(0, sep);
 		src = getSourceAPI(api);
+		if(!src)
+		{
+			AFB_ERROR("This signal'source isn't registered. Check your configuration.");
+			return -1;
+		}
 	}
 	else
 	{

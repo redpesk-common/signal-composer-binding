@@ -69,7 +69,7 @@ Signal::Signal(const std::string& id,
  frequency_(frequency),
  unit_(unit),
  onReceived_(onReceived),
- getSignalsArgs_(),
+ getSignalsArgs_(nullptr),
  signalCtx_({nullptr, nullptr, nullptr, nullptr}),
  subscribed_(false)
 {}
@@ -127,8 +127,10 @@ const std::string Signal::id() const
 /// @return the built JSON object representing the Signal
 json_object* Signal::toJSON() const
 {
-	json_object* queryJ = nullptr;
+	json_object* sigJ = json_object_new_object();
+	json_object *nameArrayJ = json_object_new_array();
 	std::vector<std::string> dependsSignalName;
+
 	for (const std::string& src: dependsSigV_ )
 	{
 		ssize_t sep = src.find_first_of("/");
@@ -137,36 +139,35 @@ json_object* Signal::toJSON() const
 			dependsSignalName.push_back(src.substr(sep+1));
 		}
 	}
-	json_object *nameArrayJ = json_object_new_array();
+
 	for (const std::string& lowSig: dependsSignalName)
 	{
 		json_object_array_add(nameArrayJ, json_object_new_string(lowSig.c_str()));
 	}
 
-	wrap_json_pack(&queryJ, "{ss,so*}",
-			"uid", id_.c_str(),
-			"getSignalsArgs", getSignalsArgs_);
-	AFB_ApiDebug(nullptr, "========== %s", json_object_get_string(queryJ));
+	json_object_object_add(sigJ, "uid", json_object_new_string(id_.c_str()));
+
+	json_object_object_add(sigJ, "getSignalsArgs", json_object_get(getSignalsArgs_));
 
 	if (!event_.empty())
-		{json_object_object_add(queryJ, "event", json_object_new_string(event_.c_str()));}
+		{json_object_object_add(sigJ, "event", json_object_new_string(event_.c_str()));}
 
 	if (json_object_array_length(nameArrayJ))
-		{json_object_object_add(queryJ, "depends", nameArrayJ);}
+		{json_object_object_add(sigJ, "depends", nameArrayJ);}
 	else
 		{json_object_put(nameArrayJ);}
 
-	if (!unit_.empty()) {json_object_object_add(queryJ, "unit", json_object_new_string(unit_.c_str()));}
+	if (!unit_.empty()) {json_object_object_add(sigJ, "unit", json_object_new_string(unit_.c_str()));}
 
-	if (frequency_) {json_object_object_add(queryJ, "frequency", json_object_new_double(frequency_));}
+	if (frequency_) {json_object_object_add(sigJ, "frequency", json_object_new_double(frequency_));}
 
-	if(timestamp_) {json_object_object_add(queryJ, "timestamp", json_object_new_int64(timestamp_));}
+	if(timestamp_) {json_object_object_add(sigJ, "timestamp", json_object_new_int64(timestamp_));}
 
-	if (value_.hasBool) {json_object_object_add(queryJ, "value", json_object_new_boolean(value_.boolVal));}
-	else if (value_.hasNum) {json_object_object_add(queryJ, "value", json_object_new_double(value_.numVal));}
-	else if (value_.hasStr) {json_object_object_add(queryJ, "value", json_object_new_string(value_.strVal.c_str()));}
+	if (value_.hasBool) {json_object_object_add(sigJ, "value", json_object_new_boolean(value_.boolVal));}
+	else if (value_.hasNum) {json_object_object_add(sigJ, "value", json_object_new_double(value_.numVal));}
+	else if (value_.hasStr) {json_object_object_add(sigJ, "value", json_object_new_string(value_.strVal.c_str()));}
 
-	return queryJ;
+	return sigJ;
 }
 
 /// @brief Initialize signal context if not already done and return it.

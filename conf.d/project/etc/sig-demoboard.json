@@ -24,10 +24,7 @@
 			"event": "low-can/diagnostic_messages.engine.speed",
 			"retention": 30,
 			"unit": "rpm",
-			"frequency": 1,
-			"onReceived": {
-				"function": "plugin://defaultOnReceived"
-			}
+			"frequency": 1
 		},
 		{
 			"uid": "fuel_level",

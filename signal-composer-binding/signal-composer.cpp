@@ -37,6 +37,22 @@ extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, struct s
 	sig->set(timestamp, value);
 }
 
+bool startsWith(const std::string& str, const std::string& pattern)
+{
+	size_t sep;
+	if( (sep = str.find(pattern)) != std::string::npos && !sep)
+		{return true;}
+	return false;
+}
+
+void extractString(void* closure, json_object* object)
+{
+	std::vector<std::string> *files = (std::vector<std::string>*) closure;
+	const char *oneFile = json_object_get_string(object);
+
+	files->push_back(oneFile);
+}
+
 // aSignal member value will be initialized in sourceAPI->addSignal()
 static struct signalCBT pluginHandle = {
 	.searchNsetSignalValue = searchNsetSignalValueHandle,
@@ -47,7 +63,7 @@ static struct signalCBT pluginHandle = {
 
 CtlSectionT Composer::ctlSections_[] = {
 	[0]={.key="plugins" , .uid="plugins", .info=nullptr,
-		.loadCB=pluginsLoad,
+		.loadCB=PluginConfig,
 		.handle=&pluginHandle,
 		.actions=nullptr},
 	[1]={.key="sources" , .uid="sources", .info=nullptr,
@@ -89,23 +105,11 @@ CtlActionT* Composer::convert2Action(const std::string& name, json_object* actio
 	CtlActionT *ctlAction = new CtlActionT;
 
 	json_object_object_add(actionJ, "uid", json_object_new_string(name.c_str()));
+
 	if(! ActionLoadOne(nullptr, ctlAction, actionJ, 0))
 		{return ctlAction;}
-
 	delete(ctlAction);
 	return nullptr;
-}
-
-/// @brief Load controller plugins
-///
-/// @param[in] section - Control Section structure
-/// @param[in] pluginsJ - JSON object containing all plugins definition made in
-///  JSON configuration file.
-///
-/// @return 0 if OK, other if not.
-int Composer::pluginsLoad(AFB_ApiT apiHandle, CtlSectionT *section, json_object *pluginsJ)
-{
-	return PluginConfig(nullptr, section, pluginsJ);
 }
 
 int Composer::loadOneSourceAPI(json_object* sourceJ)
@@ -158,7 +162,9 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 	if(!getSignalsJ)
 	{
 		getSignalsJ = json_object_new_object();
-		std::string function = "api://" + std::string(api) + "/subscribe";
+		std::string uri = "api://" + std::string(api);
+		std::string function = "subscribe";
+		json_object_object_add(getSignalsJ, "uri", json_object_new_string(uri.c_str()));
 		json_object_object_add(getSignalsJ, "function", json_object_new_string(function.c_str()));
 	}
 	getSignalsCtl = convert2Action("getSignals", getSignalsJ);
@@ -259,11 +265,6 @@ int Composer::loadOneSignal(json_object* signalJ)
 		}
 		std::string api = eventStr.substr(0, sep);
 		src = getSourceAPI(api);
-		if(!src)
-		{
-			AFB_ERROR("This signal'source isn't registered. Check your configuration.");
-			return -1;
-		}
 	}
 	else
 	{
@@ -362,6 +363,8 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 			{err = composer.loadOneSignal(signalsJ);}
 		AFB_NOTICE("%ld new signals added to service", count);
 	}
+	else
+		{Composer::instance().initSignals();}
 
 	return err;
 }
@@ -450,27 +453,6 @@ void* Composer::createContext(void* ctx)
 void Composer::destroyContext(void* ctx)
 {
 	delete(reinterpret_cast<clientAppCtx*>(ctx));
-}
-
-std::vector<std::string> Composer::parseURI(const std::string& uri)
-{
-	std::vector<std::string> uriV;
-	std::string delimiters = "/";
-
-	std::string::size_type start = 0;
-	auto pos = uri.find_first_of(delimiters, start);
-	while(pos != std::string::npos)
-	{
-		if(pos != start) // ignore empty tokens
-			uriV.emplace_back(uri, start, pos - start);
-		start = pos + 1;
-		pos = uri.find_first_of(delimiters, start);
-	}
-
-	if(start < uri.length()) // ignore trailing delimiter
-	uriV.emplace_back(uri, start, uri.length() - start); // add what's left of the string
-
-	return uriV;
 }
 
 int Composer::loadConfig(std::string& filepath)

@@ -19,10 +19,10 @@
 			"basename": "gps"
 		},
 		{
-			"uid": "builtin",
-			"info": "Builtin routine for onReceived or getSignals routines",
-			"basename": "builtin",
-			"lua2c": "setSignalValueWrap"
+			"uid": "convert",
+			"info": "LUA fonctions used to convert standard unit.",
+			"spath": "/tmp",
+			"file": "unit-conversion.lua"
 		}
 	],
 	"signals": {

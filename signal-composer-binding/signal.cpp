@@ -189,7 +189,8 @@ struct signalCBT* Signal::get_context()
 
 		signalCtx_.aSignal = (void*)this;
 
-		signalCtx_.pluginCtx = onReceived_ && onReceived_->type == CTL_TYPE_CB ?
+		signalCtx_.pluginCtx = onReceived_ && onReceived_->type == CTL_TYPE_CB
+		&& onReceived_->exec.cb.plugin ?
 			onReceived_->exec.cb.plugin->context:
 			nullptr;
 	}

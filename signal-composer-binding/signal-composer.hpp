@@ -35,7 +35,6 @@ private:
 	~Composer();
 
 	CtlActionT* convert2Action(const std::string& name, json_object* action);
-	static int pluginsLoad(AFB_ApiT apiHandle, CtlSectionT *section, json_object *pluginsJ);
 
 	int loadOneSourceAPI(json_object* sourcesJ);
 	static int loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_object *signalsJ);
@@ -50,7 +49,6 @@ public:
 	static Composer& instance();
 	static void* createContext(void* ctx);
 	static void destroyContext(void* ctx);
-	static std::vector<std::string> parseURI(const std::string& uri);
 	int loadConfig(std::string& filepath);
 	int loadSources(json_object* sourcesJ);
 	int loadSignals(json_object* signalsJ);

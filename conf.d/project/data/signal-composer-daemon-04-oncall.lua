@@ -64,7 +64,7 @@ function _Unit_Converter(source, args, event)
 
   print('Converted value is: '.. event['value'] ..  args["to"])
 
-  _lua2c['setSignalValueWrap'](source, event)
+  composer:setSignalValueWrap(source, event)
 end
 
 -- Display receive arguments and echo them to caller

@@ -6,7 +6,8 @@
 			"api": "low-can",
 			"info": "Low level binding to handle CAN bus communications",
 			"getSignals": {
-				"function": "plugin://low-can-callbacks/subscribeToLow"
+				"uri": "plugin://low-can-callbacks",
+				"function": "subscribeToLow"
 			}
 		},
 		{
@@ -14,7 +15,8 @@
 			"api": "gps",
 			"info": "Low level binding which retrieve Satellite positionning values",
 			"init": {
-				"function": "api://gps/subscribe",
+				"uri": "api://gps",
+				"function": "subscribe",
 				"args": {
 					"value": "location"
 				}

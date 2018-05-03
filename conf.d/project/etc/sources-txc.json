@@ -6,11 +6,13 @@
 			"api": "txc",
 			"info": "Use TXC demo binding as signals provider",
 			"init": {
-				"function": "api://txc/start",
+				"uri": "api://txc",
+				"function": "start",
 				"args": {"filename": "var/nyc-downtown-crosstown.json"}
 			},
 			"getSignals": {
-				"function": "api://txc/subscribe"
+				"uri": "api://txc",
+				"function": "subscribe"
 			}
 		}
 	]

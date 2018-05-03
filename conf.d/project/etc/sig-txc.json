@@ -8,6 +8,14 @@
 			"unit": "km/h",
 			"getSignalsArgs": {
 				"event": "vehicle_speed"
+			},
+			"onReceived": {
+				"uri": "lua://convert/",
+				"function": "_Unit_Converter",
+				"args": {
+					"from": "km/h",
+					"to": "mi/h"
+				}
 			}
 		},
 		{
@@ -96,7 +104,8 @@
 			"retention": 30,
 			"unit": "degrees",
 			"onReceived": {
-				"function": "plugin://gps-callbacks/getHeading"
+				"uri": "plugin://gps-callbacks",
+				"function": "getHeading"
 			}
 		}
 	]

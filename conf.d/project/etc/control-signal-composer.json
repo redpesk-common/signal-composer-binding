@@ -9,15 +9,20 @@
 	},
 	"plugins": [
 		{
+			"uid": "convert",
+			"info": "LUA fonctions used to convert standard unit.",
+			"libs": "unit-conversion.lua"
+		},
+		{
 			"uid": "gps-callbacks",
 			"info": "Manage interaction with gps service",
-			"basename": "gps"
+			"libs": "gps.ctlso"
 		}
 	],
 	"signals": {
 		"files": ["sig-txc" ]
 	},
 	"sources": {
-		"files": "sources"
+		"files": "sources-txc"
 	}
 }

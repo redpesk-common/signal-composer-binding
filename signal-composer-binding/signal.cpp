@@ -355,7 +355,10 @@ void Signal::onReceivedCB(json_object *eventJ)
 	source.api  = nullptr; // We use binding v2, no dynamic API.
 	source.request = {nullptr, nullptr};
 	source.context = (void*)get_context();
-	onReceived_ ? ActionExecOne(&source, onReceived_, eventJ) : defaultReceivedCB(eventJ);
+	if (onReceived_)
+		ActionExecOne(&source, onReceived_, json_object_get(eventJ));
+	else
+		defaultReceivedCB(eventJ);
 }
 
 /// @brief Make a Signal observer observes Signals observables

@@ -65,7 +65,9 @@ CTLP_ONLOAD(plugin, composerHandle)
 	struct signalCBT* handle = (struct signalCBT*)composerHandle;
 	handle->pluginCtx = (void*)pluginCtx;
 
-	return (void*)handle;
+	plugin->context = (void*)handle;
+
+	return 0;
 }
 
 CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {

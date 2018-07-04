@@ -50,7 +50,7 @@ void SourceAPI::init()
 		source.uid = init_->uid;
 		source.api  = nullptr; // We use binding v2, no dynamic API.
 		source.request = {nullptr, nullptr};
-		ActionExecOne(&source, init_, nullptr);
+		ActionExecOne(&source, init_, json_object_new_object());
 		return;
 	}
 	else if(api_ == afbBindingV2.api)

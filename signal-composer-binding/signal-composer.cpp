@@ -461,7 +461,7 @@ int Composer::loadConfig(std::string& filepath)
 	if (!dirList) dirList=CONTROL_CONFIG_PATH;
 	filepath.append(":");
 	filepath.append(dirList);
-	const char *configPath = CtlConfigSearch(nullptr, filepath.c_str(), "control-");
+	const char *configPath = CtlConfigSearch(nullptr, filepath.c_str(), "control");
 
 	if (!configPath) {
 		AFB_ApiError(apiHandle, "CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());

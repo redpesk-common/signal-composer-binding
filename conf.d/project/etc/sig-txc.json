@@ -10,8 +10,7 @@
 				"event": "vehicle_speed"
 			},
 			"onReceived": {
-				"uri": "lua://convert",
-				"function": "_Unit_Converter",
+				"action": "lua://convert#_Unit_Converter",
 				"args": {
 					"from": "km/h",
 					"to": "mi/h"
@@ -104,8 +103,7 @@
 			"retention": 30,
 			"unit": "degrees",
 			"onReceived": {
-				"uri": "plugin://gps-callbacks",
-				"function": "getHeading"
+				"action": "plugin://gps-callbacks#getHeading"
 			}
 		}
 	]

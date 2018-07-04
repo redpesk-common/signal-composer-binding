@@ -11,18 +11,18 @@
 		{
 			"uid": "low-can-callbacks",
 			"info": "Manage interaction with low-can service",
-			"basename": "low-can"
+			"libs": "low-can.ctlso"
 		},
 		{
 			"uid": "gps-callbacks",
 			"info": "Manage interaction with gps service",
-			"basename": "gps"
+			"libs": "gps.ctlso"
 		},
 		{
 			"uid": "convert",
 			"info": "LUA fonctions used to convert standard unit.",
 			"spath": "/tmp",
-			"file": "unit-conversion.lua"
+			"libs": "unit-conversion.lua"
 		}
 	],
 	"signals": {

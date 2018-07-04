@@ -10,7 +10,7 @@
 				"event": "vehicle_speed"
 			},
 			"onReceived": {
-				"uri": "lua://convert/",
+				"uri": "lua://convert",
 				"function": "_Unit_Converter",
 				"args": {
 					"from": "km/h",

@@ -17,6 +17,13 @@
 			"uid": "gps-callbacks",
 			"info": "Manage interaction with gps service",
 			"libs": "gps.ctlso"
+		},
+		{
+			"uid": "builtin",
+			"info": "Builtin routine for onReceived or getSignals routines",
+			"libs": "builtin.ctlso",
+			"lua2c": "setSignalValueWrap",
+			"lua2c_prefix": "bui"
 		}
 	],
 	"signals": {

@@ -16,6 +16,28 @@
 # limitations under the License.
 ###########################################################################
 
+PROJECT_TARGET_ADD(builtin)
+
+		# Define targets
+		ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
+
+		# Alsa Plugin properties
+		SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+				LABELS "PLUGIN"
+				PREFIX ""
+				SUFFIX ".ctlso"
+				OUTPUT_NAME ${TARGET_NAME}
+		)
+
+		# Library dependencies (include updates automatically)
+		TARGET_LINK_LIBRARIES(${TARGET_NAME}
+				${link_libraries}
+		)
+
+		target_include_directories(${TARGET_NAME}
+		PRIVATE "../ctl-utilities/ctl-lib"
+		PRIVATE "../signal-composer-binding")
+
 PROJECT_TARGET_ADD(low-can)
 
 	# Define targets

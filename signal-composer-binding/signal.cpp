@@ -281,25 +281,27 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 		if (key.find("value") != std::string::npos ||
 			key.find(id_) != std::string::npos)
 		{
-			switch(json_object_get_type(value)) {
-				case json_type_double: {
+			switch (json_object_get_type(value)) {
+				case json_type_double:
 					sv = json_object_get_double(value);
 					break;
-				}
-				case json_type_boolean: {
+				case json_type_int:
 					sv = json_object_get_int(value);
 					break;
-				}
-				case json_type_string: {
+				case json_type_boolean:
+					sv = json_object_get_int(value);
+					break;
+				case json_type_string:
 					sv = json_object_get_string(value);
 					break;
-				}
+				default:
+					sv = signalValue();
+					break;
 			}
 		}
 		else if (key.find("timestamp") != std::string::npos)
 		{
 			ts = json_object_is_type(value, json_type_int) ? json_object_get_int64(value):ts;
-			ts = json_object_is_type(value, json_type_double) ? (uint64_t)json_object_get_double(value) * NANO : ts;
 		}
 		json_object_iter_next(&iter);
 	}

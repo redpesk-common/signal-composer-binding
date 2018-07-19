@@ -265,7 +265,7 @@ void get(struct afb_req request)
 int loadConf()
 {
 	int err = 0;
-	std::string bindingDirPath = GetBindingDirPath(nullptr);
+	std::string bindingDirPath = GetBindingDirPath();
 	std::string rootdir = bindingDirPath + "/etc";
 
 	err = Composer::instance().loadConfig(rootdir);

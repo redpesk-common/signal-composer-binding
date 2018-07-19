@@ -16,7 +16,6 @@
  *
 */
 
-#define AFB_BINDING_VERSION 2
 #define CTL_PLUGIN_MAGIC 1286576532
 #include <afb/afb-binding.h>
 #include <systemd/sd-event.h>

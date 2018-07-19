@@ -19,7 +19,6 @@
 # Project Info
 # ------------------
 set(PROJECT_NAME signal-composer)
-set(PROJECT_VERSION "5.0")
 set(PROJECT_PRETTY_NAME "Signal composer")
 set(PROJECT_DESCRIPTION "Signal composer API connected to low level AGL services")
 set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/#/admin/projects/apps/agl-service-signal-composer")
@@ -45,7 +44,7 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
-set(CMAKE_BUILD_TYPE "DEBUG")
+set(BUILD_TYPE "DEBUG")
 
 
 # Kernel selection if needed. You can choose between a
@@ -79,7 +78,7 @@ set (PKG_REQUIRED_LIST
 # Prefix path where will be installed the files
 # Default: /usr/local (need root permission to write in)
 # ------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
+set(INSTALL_PREFIX $ENV{HOME}/opt)
 
 # Customize link option
 # -----------------------------
@@ -132,11 +131,7 @@ set(CONTROL_SUPPORT_LUA 1)
 add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/lib/plugins:${CMAKE_BINARY_DIR}/package/lib/plugins:${CMAKE_BINARY_DIR}/package/var")
 add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/etc:${CMAKE_BINARY_DIR}/package/etc")
 add_definitions(-DCTL_PLUGIN_MAGIC=1286576532)
-
-# (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
-# ---------------------------------------------------------------------
-set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/lib64/pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
-set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
+add_definitions(-DAFB_BINDING_VERSION=2)
 
 # Optional location for config.xml.in
 # -----------------------------------

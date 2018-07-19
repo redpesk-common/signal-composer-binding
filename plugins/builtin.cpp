@@ -16,7 +16,6 @@
  *
 */
 
-#define AFB_BINDING_VERSION 2
 #include <afb/afb-binding.h>
 #include <systemd/sd-event.h>
 #include <json-c/json_object.h>

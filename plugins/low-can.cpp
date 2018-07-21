@@ -31,8 +31,8 @@ extern "C"
 CTLP_CAPI_REGISTER("low-can");
 
 typedef struct {
-	bool door;
-	bool window;
+	json_object* door;
+	json_object* window;
 } doorT;
 
 typedef struct {
@@ -47,11 +47,13 @@ struct pluginCtxT {
 	allDoorsCtxT allDoorsCtx;
 };
 
-void setDoor(doorT* aDoor, const char* eventName, int eventStatus)
+void setDoor(doorT* aDoor, const char* eventName, json_object* eventStatus)
 {
-	if(strcasestr(eventName, "door")) {aDoor->door = eventStatus;}
-	else if(strcasestr(eventName, "window")) {aDoor->window = eventStatus;}
-	else {AFB_WARNING("Unexpected behavior, this '%s' is not a door ! ", eventName);}
+	if(json_object_is_type(eventStatus, json_type_boolean)) {
+		if(strcasestr(eventName, "door")) aDoor->door = eventStatus;
+		else if(strcasestr(eventName, "window")) aDoor->window = eventStatus;
+		else AFB_WARNING("Unexpected behavior, this '%s' is not a door ! ", eventName);
+	}
 }
 
 // Call at initialisation time
@@ -132,12 +134,12 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
 
 CTLP_CAPI (isOpen, source, argsJ, eventJ) {
 	const char *eventName = nullptr;
-	int eventStatus;
+	json_object *eventStatus;
 	uint64_t timestamp;
 	struct signalCBT* context = reinterpret_cast<struct signalCBT*>(source->context);
 	struct pluginCtxT* pluginCtx = reinterpret_cast<struct pluginCtxT*>(context->pluginCtx);
 
-	int err = wrap_json_unpack(eventJ, "{ss,sb,s?I}",
+	int err = wrap_json_unpack(eventJ, "{ss,so,s?I}",
 		"name", &eventName,
 		"value", &eventStatus,
 		"timestamp", &timestamp);
@@ -177,14 +179,14 @@ CTLP_CAPI (isOpen, source, argsJ, eventJ) {
 	source->uid,
 	argsJ ? json_object_to_json_string(argsJ):"",
 	eventJ ? json_object_to_json_string(eventJ):"",
-	pluginCtx->allDoorsCtx.front_left.door ? "true":"false",
-	pluginCtx->allDoorsCtx.front_left.window ? "true":"false",
-	pluginCtx->allDoorsCtx.front_right.door ? "true":"false",
-	pluginCtx->allDoorsCtx.front_right.window ? "true":"false",
-	pluginCtx->allDoorsCtx.rear_left.door ? "true":"false",
-	pluginCtx->allDoorsCtx.rear_left.window ? "true":"false",
-	pluginCtx->allDoorsCtx.rear_right.door ? "true":"false",
-	pluginCtx->allDoorsCtx.rear_right.window ? "true":"false"
+	json_object_get_string(pluginCtx->allDoorsCtx.front_left.door),
+	json_object_get_string(pluginCtx->allDoorsCtx.front_left.window),
+	json_object_get_string(pluginCtx->allDoorsCtx.front_right.door),
+	json_object_get_string(pluginCtx->allDoorsCtx.front_right.window),
+	json_object_get_string(pluginCtx->allDoorsCtx.rear_left.door),
+	json_object_get_string(pluginCtx->allDoorsCtx.rear_left.window),
+	json_object_get_string(pluginCtx->allDoorsCtx.rear_right.door),
+	json_object_get_string(pluginCtx->allDoorsCtx.rear_right.window)
 );
 
 	return 0;

@@ -32,27 +32,23 @@ CTLP_LUA_REGISTER("builtin");
 CTLP_LUA2C (setSignalValueWrap, source, argsJ, responseJ)
 {
 	const char* name = nullptr;
-	double resultNum;
+	json_object* resultNumJ;
 	uint64_t timestamp;
 
 	struct signalCBT* ctx = (struct signalCBT*)source->context;
 
-	if(! wrap_json_unpack(argsJ, "{ss, sF, sI? !}",
+	if(! wrap_json_unpack(argsJ, "{ss, so, sI? !}",
 		"name", &name,
-		"value", &resultNum,
+		"value", &resultNumJ,
 		"timestamp", &timestamp))
 	{
-		*responseJ = json_object_new_string("Fail to unpack JSON arguments value");
 		return -1;
 	}
-	*responseJ = json_object_new_string(json_object_to_json_string(argsJ));
-
-	struct signalValue result = resultNum;
 
 	if(ctx->aSignal)
-		{ctx->setSignalValue(ctx->aSignal, timestamp*NANO, result);}
+		ctx->setSignalValue(ctx->aSignal, timestamp*NANO, resultNumJ);
 	else
-		{ctx->searchNsetSignalValue(name, timestamp*NANO, result);}
+		ctx->searchNsetSignalValue(name, timestamp*NANO, resultNumJ);
 
 	return 0;
 }

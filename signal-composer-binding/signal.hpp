@@ -28,40 +28,14 @@
 
 class Composer;
 
-/// @brief Structure holding a possible value of a Signal
-///  as it could be different type of value, we declare all
-///  possibility.
-///  Not very efficient or optimized, maybe use of Variant in
-///  C++17 but this is a bit too new to uses it for now
-struct signalValue {
-	bool undefined;
-	bool hasBool;
-	bool boolVal;
-	bool hasNum;
-	double numVal;
-	bool hasStr;
-	std::string strVal;
-
-	signalValue():
-		undefined(true), hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(false), strVal("") {};
-	signalValue(bool b):
-		undefined(false), hasBool(true), boolVal(b), hasNum(false), numVal(0), hasStr(false), strVal("") {};
-	signalValue(int i):
-		undefined(false), hasBool(false), boolVal(false), hasNum(true), numVal(i), hasStr(false), strVal("") {};
-	signalValue(double d):
-		undefined(false), hasBool(false), boolVal(false), hasNum(true), numVal(d), hasStr(false), strVal("") {};
-	signalValue(const std::string& s):
-		undefined(false), hasBool(false), boolVal(false), hasNum(false), numVal(0), hasStr(true), strVal(s) {};
-};
-
-extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, struct signalValue value);
-extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, struct signalValue value);
+extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, json_object* value);
+extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, json_object* value);
 
 /// @brief Holds composer callbacks and obj to manipulate
 struct signalCBT
 {
-	void (*searchNsetSignalValue)(const char* aName, uint64_t timestamp, struct signalValue value);
-	void (*setSignalValue)(void* aSignal, uint64_t timestamp, struct signalValue value);
+	void (*searchNsetSignalValue)(const char* aName, uint64_t timestamp, json_object* value);
+	void (*setSignalValue)(void* aSignal, uint64_t timestamp, json_object* value);
 	void* aSignal;
 	void* pluginCtx;
 };
@@ -80,8 +54,8 @@ private:
 	std::string event_;
 	std::vector<std::string> dependsSigV_;
 	uint64_t timestamp_;
-	struct signalValue value_;
-	std::map<uint64_t, struct signalValue> history_; ///< history_ - Hold signal value history in map with <timestamp, value>
+	json_object* value_;
+	std::map<uint64_t, json_object*> history_; ///< history_ - Hold signal value history in map with <timestamp, value>
 	int retention_;
 	double frequency_;
 	std::string unit_;
@@ -107,17 +81,16 @@ public:
 	struct signalCBT* get_context();
 	json_object *getSignalsArgs();
 
-	void set(uint64_t timestamp, struct signalValue& value);
+	void set(uint64_t timestamp, json_object*& value);
 	void update(Signal* sig);
-	static int defaultOnReceivedCB(CtlSourceT* source, json_object* argsJ, json_object *queryJ);
-	void defaultReceivedCB(json_object *eventJ);
+	static void defaultReceivedCB(Signal *signal, json_object *eventJ);
 	void onReceivedCB(json_object *eventJ);
 	void attachToSourceSignals(Composer& composer);
 
 	double average(int seconds = 0) const;
 	double minimum(int seconds = 0) const;
 	double maximum(int seconds = 0) const;
-	struct signalValue last_value() const;
+	json_object* last_value() const;
 	uint64_t last_timestamp() const;
 
 	int initialRecursionCheck();

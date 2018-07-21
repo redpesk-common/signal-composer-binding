@@ -32,10 +32,8 @@
 /// @param[in] object - eventual data that comes with the event
 void onEvent(const char *event, json_object *object)
 {
-	Composer& composer = Composer::instance();
-	AFB_NOTICE("event: %s", json_object_to_json_string(object));
+	std::vector<std::shared_ptr<Signal>> signals { Composer::instance().searchSignals(event) };
 
-	std::vector<std::shared_ptr<Signal>> signals = composer.searchSignals(event);
 	if(!signals.empty())
 	{
 		// If there is more than 1 element then maybe we can find a more

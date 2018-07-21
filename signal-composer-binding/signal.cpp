@@ -148,9 +148,8 @@ json_object* Signal::toJSON() const
 	if(timestamp_)
 		json_object_object_add(sigJ, "timestamp", json_object_new_int64(timestamp_));
 
-	if (value_.hasBool) {json_object_object_add(sigJ, "value", json_object_new_boolean(value_.boolVal));}
-	else if (value_.hasNum) {json_object_object_add(sigJ, "value", json_object_new_double(value_.numVal));}
-	else if (value_.hasStr) {json_object_object_add(sigJ, "value", json_object_new_string(value_.strVal.c_str()));}
+	if(value_)
+		json_object_object_add(sigJ, "value", value_);
 
 	return sigJ;
 }
@@ -198,19 +197,21 @@ json_object *Signal::getSignalsArgs()
 ///
 /// @param[in] timestamp - timestamp of occured signal
 /// @param[in] value - value of change
-void Signal::set(uint64_t timestamp, struct signalValue& value)
+void Signal::set(uint64_t timestamp, json_object*& value)
 {
 	uint64_t diff = retention_+1;
 	value_ = value;
 	timestamp_ = timestamp;
-	history_[timestamp_] = value_;
+	history_[timestamp_] = json_object_get(value_);
 
 	while(diff > retention_)
 	{
 		uint64_t first = history_.begin()->first;
 		diff = (timestamp_ - first)/NANO;
-		if(diff > retention_)
-			{history_.erase(history_.cbegin());}
+		if(diff > retention_) {
+			json_object_put(history_.cbegin()->second);
+			history_.erase(history_.cbegin());
+		}
 	}
 
 	notify();
@@ -253,37 +254,22 @@ void Signal::update(Signal* sig)
 /// @param[in] eventJ - json_object containing event data to process
 ///
 /// @return 0 if ok, -1 or others if not
-void Signal::defaultReceivedCB(json_object *eventJ)
+void Signal::defaultReceivedCB(Signal *signal, json_object *eventJ)
 {
 	uint64_t ts = 0;
-	struct signalValue sv;
+	json_object* sv = nullptr;
 	json_object_iterator iter = json_object_iter_begin(eventJ);
 	json_object_iterator iterEnd = json_object_iter_end(eventJ);
+
 	while(!json_object_iter_equal(&iter, &iterEnd))
 	{
 		std::string key = json_object_iter_peek_name(&iter);
 		std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 		json_object *value = json_object_iter_peek_value(&iter);
 		if (key.find("value") != std::string::npos ||
-			key.find(id_) != std::string::npos)
+			key.find(signal->id()) != std::string::npos)
 		{
-			switch (json_object_get_type(value)) {
-				case json_type_double:
-					sv = json_object_get_double(value);
-					break;
-				case json_type_int:
-					sv = json_object_get_int(value);
-					break;
-				case json_type_boolean:
-					sv = json_object_get_int(value);
-					break;
-				case json_type_string:
-					sv = json_object_get_string(value);
-					break;
-				default:
-					sv = signalValue();
-					break;
-			}
+			sv = json_object_get(value);
 		}
 		else if (key.find("timestamp") != std::string::npos)
 		{
@@ -292,9 +278,9 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 		json_object_iter_next(&iter);
 	}
 
-	if(!sv.hasBool && !sv.hasNum && !sv.hasStr)
+	if(!sv)
 	{
-		AFB_ERROR("No data found to set signal %s in %s", id_.c_str(), json_object_to_json_string(eventJ));
+		AFB_ERROR("No data found to set signal %s in %s", signal->id().c_str(), json_object_to_json_string(eventJ));
 		return;
 	}
 	else if(ts == 0)
@@ -305,7 +291,7 @@ void Signal::defaultReceivedCB(json_object *eventJ)
 			ts = (uint64_t)(t.tv_sec) * (uint64_t)NANO + (uint64_t)(t.tv_nsec);
 	}
 
-	set(ts, sv);
+	signal->set(ts, sv);
 }
 
 /// @brief Notify observers that there is a change and execute callback defined
@@ -343,7 +329,7 @@ void Signal::onReceivedCB(json_object *eventJ)
 	if (onReceived_)
 		ActionExecOne(&source, onReceived_, json_object_get(eventJ));
 	else
-		defaultReceivedCB(eventJ);
+		defaultReceivedCB(this, eventJ);
 }
 
 /// @brief Make a Signal observer observes Signals observables
@@ -382,22 +368,31 @@ double Signal::average(int seconds) const
 	double total = 0.0;
 	int nbElt = 0;
 
-	for (const auto& val: history_)
+	for(const auto& val: history_)
 	{
-		if(val.first >= end)
-			{break;}
-		if(val.second.hasNum)
+		if(val.first >= end) {
+			break;
+		}
+		if(val.second)
 		{
-			total += val.second.numVal;
+			switch(json_object_get_type(val.second)) {
+				case json_type_int:
+					total += static_cast<double>(json_object_get_int64(val.second));
+					break;
+				case json_type_double:
+					total += json_object_get_double(val.second);
+					break;
+				default:
+					AFB_ERROR("The stored value '%s' for the signal '%s' isn't numeric, it is not possible to compute an average value.", json_object_get_string(val.second), id_.c_str());
+					break;
+			}
 			nbElt++;
 		}
 		else
 		{
-			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value : bool %d, num %lf, str: %s",
+			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value: %s",
 			id_.c_str(),
-			val.second.boolVal,
-			val.second.numVal,
-			val.second.strVal.c_str());
+			json_object_get_string(val.second));
 			break;
 		}
 	}
@@ -416,21 +411,34 @@ double Signal::minimum(int seconds) const
 	uint64_t end = seconds ?
 	begin+(seconds*NANO) :
 	history_.rbegin()->first;
+	double current = 0.0;
 
 	double min = DBL_MAX;
-	for (auto& v : history_)
+	for(const auto& val : history_)
 	{
-		if(v.first >= end)
-			{break;}
-		else if(v.second.hasNum && v.second.numVal < min)
-			{min = v.second.numVal;}
+		if(val.first >= end) {
+			break;
+		}
+		else if(val.second) {
+			switch(json_object_get_type(val.second)) {
+				case json_type_int:
+					current = static_cast<double>(json_object_get_int64(val.second));
+					min = current < min ? current : min;
+					break;
+				case json_type_double:
+					current = json_object_get_double(val.second);
+					min = current < min ? current : min;
+					break;
+				default:
+					AFB_ERROR("The stored value '%s' for signal '%s' isn't numeric, it is not possible to find a minimum value.", json_object_get_string(val.second), id_.c_str());
+					break;
+			}
+		}
 		else
 		{
-			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value : bool %d, num %lf, str: %s",
+			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value: %s",
 			id_.c_str(),
-			v.second.boolVal,
-			v.second.numVal,
-			v.second.strVal.c_str());
+			json_object_get_string(val.second));
 			break;
 		}
 	}
@@ -448,21 +456,34 @@ double Signal::maximum(int seconds) const
 	uint64_t end = seconds ?
 	begin+(seconds*NANO) :
 	history_.rbegin()->first;
+	double current = 0.0;
 
 	double max = 0.0;
-	for (auto& v : history_)
+	for(const auto& val : history_)
 	{
-		if(v.first >= end)
-		{break;}
-		else if(v.second.hasNum && v.second.hasNum > max)
-			{max = v.second.numVal;}
+		if(val.first >= end) {
+			break;
+		}
+		else if(val.second) {
+			switch(json_object_get_type(val.second)) {
+				case json_type_int:
+					current = static_cast<double>(json_object_get_int64(val.second));
+					max = current > max ? current : max;
+					break;
+				case json_type_double:
+					current = json_object_get_double(val.second);
+					max = current > max ? current : max;
+					break;
+				default:
+					AFB_ERROR("The stored value '%s' for signal '%s' isn't numeric, it is not possible to find a maximum value.", json_object_get_string(val.second), id_.c_str());
+					break;
+			}
+		}
 		else
 		{
-			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value : bool %d, num %lf, str: %s",
+			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value: %s",
 			id_.c_str(),
-			v.second.boolVal,
-			v.second.numVal,
-			v.second.strVal.c_str());
+			json_object_get_string(val.second));
 			break;
 		}
 	}
@@ -472,7 +493,7 @@ double Signal::maximum(int seconds) const
 /// @brief Return last value recorded
 ///
 /// @return Last value
-struct signalValue Signal::last_value() const
+json_object* Signal::last_value() const
 {
 	return value_;
 }

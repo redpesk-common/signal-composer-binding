@@ -59,7 +59,7 @@ CTLP_CAPI (getHeading, source, argsJ, eventJ) {
 
 	if(coordUpdated) {
 		heading = round(r2d * atan2((curLon - prvLon) * cos(d2r * curLat), curLat - prvLat));
-		ctx->setSignalValue(ctx->aSignal, 0, heading);
+		ctx->setSignalValue(ctx->aSignal, 0, json_object_new_double(heading));
 	}
 
 	AFB_NOTICE("======== Heading: %f", heading);

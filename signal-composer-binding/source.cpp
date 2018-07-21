@@ -122,7 +122,7 @@ std::vector<std::shared_ptr<Signal>> SourceAPI::searchSignals(const std::string&
 
 	if(signalsM_.count(name))
 		{signals.emplace_back(signalsM_[name]);}
-	if(newSignalsM_.count(name))
+	else if(newSignalsM_.count(name))
 		{signals.emplace_back(signalsM_[name]);}
 	else
 	{

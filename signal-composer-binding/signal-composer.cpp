@@ -21,7 +21,7 @@
 
 #include "clientApp.hpp"
 
-extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, struct signalValue value)
+extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, json_object* value)
 {
 	std::vector<std::shared_ptr<Signal>> signals = Composer::instance().searchSignals(aName);
 	if(!signals.empty())
@@ -31,7 +31,7 @@ extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestam
 	}
 }
 
-extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, struct signalValue value)
+extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, json_object* value)
 {
 	Signal* sig = static_cast<Signal*>(aSignal);
 	sig->set(timestamp, value);
@@ -380,47 +380,25 @@ void Composer::processOptions(const std::map<std::string, int>& opts, std::share
 		{
 			avg = true;
 			double value = sig->average(o.second);
-			json_object_object_add(response, "value",
-				json_object_new_double(value));
+			json_object_object_add(response, "value", json_object_new_double(value));
 		}
 		else if (o.first.compare("minimum") && !min)
 		{
 			min = true;
 			double value = sig->minimum();
-			json_object_object_add(response, "value",
-				json_object_new_double(value));
+			json_object_object_add(response, "value", json_object_new_double(value));
 		}
 		else if (o.first.compare("maximum") && !max)
 		{
 			max = true;
 			double value = sig->maximum();
-			json_object_object_add(response, "value",
-				json_object_new_double(value));
+			json_object_object_add(response, "value", json_object_new_double(value));
 		}
 		else if (o.first.compare("last") && !last)
 		{
 			last = true;
-			struct signalValue value = sig->last_value();
-			if(value.hasBool)
-			{
-				json_object_object_add(response, "value",
-					json_object_new_boolean(value.boolVal));
-			}
-			else if(value.hasNum)
-			{
-				json_object_object_add(response, "value",
-					json_object_new_double(value.numVal));
-			}
-			else if(value.hasStr)
-			{
-				json_object_object_add(response, "value",
-					json_object_new_string(value.strVal.c_str()));
-			}
-			else
-			{
-				json_object_object_add(response, "value",
-					json_object_new_string("No recorded value so far."));
-			}
+			json_object* value = sig->last_value();
+			json_object_object_add(response, "value", value);
 		}
 		else
 		{
@@ -568,8 +546,9 @@ std::vector<std::shared_ptr<Signal>> Composer::searchSignals(const std::string& 
 	if(sep != std::string::npos)
 	{
 		api = aName.substr(0, sep);
+		std::string signal_id = aName.substr(sep + 1, std::string::npos);
 		std::shared_ptr<SourceAPI> source = getSourceAPI(api);
-		return source->searchSignals(aName);
+		return source->searchSignals(signal_id);
 	}
 	else
 	{
@@ -603,27 +582,8 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 				"signal", sig->id().c_str());
 			if (opts.empty())
 			{
-				struct signalValue value = sig->last_value();
-				if(value.hasBool)
-				{
-					json_object_object_add(response, "value",
-						json_object_new_boolean(value.boolVal));
-				}
-				else if(value.hasNum)
-				{
-					json_object_object_add(response, "value",
-						json_object_new_double(value.numVal));
-				}
-				else if(value.hasStr)
-				{
-					json_object_object_add(response, "value",
-						json_object_new_string(value.strVal.c_str()));
-				}
-				else
-				{
-					json_object_object_add(response, "value",
-						json_object_new_string("No recorded value so far."));
-				}
+				json_object* value = sig->last_value();
+				json_object_object_add(response, "value", value);
 			}
 			else
 				{processOptions(opts, sig, response);}

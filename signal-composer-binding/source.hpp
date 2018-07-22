@@ -47,7 +47,7 @@ public:
 	void init();
 	std::string api() const;
 	const struct signalsDefault& signalsDefault() const;
-	void addSignal(const std::string& id, const std::string& event, std::vector<std::string>& sources, int retention, const std::string& unit, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs);
+	void addSignal(const std::string& id, const std::string& event, std::vector<std::string>& sources, int retention, const std::string& unit, json_object *metadata, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs);
 
 	void initSignals();
 	std::vector<std::shared_ptr<Signal>> getSignals() const;

@@ -67,9 +67,9 @@ const struct signalsDefault& SourceAPI::signalsDefault() const
 	return signalsDefault_;
 }
 
-void SourceAPI::addSignal(const std::string& id, const std::string& event, std::vector<std::string>& depends, int retention, const std::string& unit, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
+void SourceAPI::addSignal(const std::string& id, const std::string& event, std::vector<std::string>& depends, int retention, const std::string& unit, json_object *metadata, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
 {
-	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, retention, frequency, onReceived, getSignalsArgs);
+	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, metadata, retention, frequency, onReceived, getSignalsArgs);
 
 	newSignalsM_[id] = sig;
 }

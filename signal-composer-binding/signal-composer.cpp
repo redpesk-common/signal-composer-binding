@@ -220,8 +220,9 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 int Composer::loadOneSignal(json_object* signalJ)
 {
 	json_object *onReceivedJ = nullptr,
-				*dependsJ = nullptr,
-				*getSignalsArgs = nullptr;
+		    *dependsJ = nullptr,
+		    *metadataJ = nullptr,
+		    *getSignalsArgs = nullptr;
 	CtlActionT* onReceivedCtl;
 	const char *id = nullptr,
 			   *event = nullptr,
@@ -232,13 +233,14 @@ int Composer::loadOneSignal(json_object* signalJ)
 	ssize_t sep;
 	std::shared_ptr<SourceAPI> src = nullptr;
 
-	int err = wrap_json_unpack(signalJ, "{ss,s?s,s?o,s?o,s?i,s?s,s?F,s?o !}",
+	int err = wrap_json_unpack(signalJ, "{ss,s?s,s?o,s?o,s?i,s?s,s?o,s?F,s?o !}",
 			"uid", &id,
 			"event", &event,
 			"depends", &dependsJ,
 			"getSignalsArgs", &getSignalsArgs,
 			"retention", &retention,
 			"unit", &unit,
+			"metadata", &metadataJ,
 			"frequency", &frequency,
 			"onReceived", &onReceivedJ);
 	if (err)
@@ -335,7 +337,7 @@ int Composer::loadOneSignal(json_object* signalJ)
 	else {onReceivedCtl = convert2Action(uid, onReceivedJ);}
 
 	if(src != nullptr)
-		{src->addSignal(id, event, dependsV, retention, unit, frequency, onReceivedCtl, getSignalsArgs);}
+		{src->addSignal(id, event, dependsV, retention, unit, metadataJ, frequency, onReceivedCtl, getSignalsArgs);}
 	else
 		{err = -1;}
 

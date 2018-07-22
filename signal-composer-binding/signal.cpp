@@ -33,13 +33,14 @@ Signal::Signal()
  retention_(0),
  frequency_(0),
  unit_(""),
+ metadata_(nullptr),
  onReceived_(nullptr),
  getSignalsArgs_(nullptr),
  signalCtx_({nullptr, nullptr, nullptr, nullptr}),
  subscribed_(false)
 {}
 
-Signal::Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
+Signal::Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, json_object *metadata, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
 :id_(id),
  event_(event),
  dependsSigV_(depends),
@@ -48,34 +49,16 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
  retention_(retention),
  frequency_(frequency),
  unit_(unit),
+ metadata_(metadata),
  onReceived_(onReceived),
  getSignalsArgs_(getSignalsArgs),
  signalCtx_({nullptr, nullptr, nullptr, nullptr}),
  subscribed_(false)
 {}
 
-Signal::Signal(const std::string& id,
-	std::vector<std::string>& depends,
-	const std::string& unit,
-	int retention,
-	double frequency,
-	CtlActionT* onReceived)
-:id_(id),
- event_(),
- dependsSigV_(depends),
- timestamp_(0.0),
- value_(),
- retention_(retention),
- frequency_(frequency),
- unit_(unit),
- onReceived_(onReceived),
- getSignalsArgs_(nullptr),
- signalCtx_({nullptr, nullptr, nullptr, nullptr}),
- subscribed_(false)
-{}
-
 Signal::~Signal()
 {
+	if(metadata_) json_object_put(metadata_);
 	if(getSignalsArgs_) json_object_put(getSignalsArgs_);
 	if(onReceived_) delete(onReceived_);
 }
@@ -135,33 +118,35 @@ json_object* Signal::toJSON() const
 	{
 		ssize_t sep = src.find_first_of("/");
 		if(sep != std::string::npos)
-		{
 			dependsSignalName.push_back(src.substr(sep+1));
-		}
 	}
 
 	for (const std::string& lowSig: dependsSignalName)
-	{
 		json_object_array_add(nameArrayJ, json_object_new_string(lowSig.c_str()));
-	}
 
 	json_object_object_add(sigJ, "uid", json_object_new_string(id_.c_str()));
 
 	json_object_object_add(sigJ, "getSignalsArgs", json_object_get(getSignalsArgs_));
 
 	if (!event_.empty())
-		{json_object_object_add(sigJ, "event", json_object_new_string(event_.c_str()));}
+		json_object_object_add(sigJ, "event", json_object_new_string(event_.c_str()));
 
 	if (json_object_array_length(nameArrayJ))
-		{json_object_object_add(sigJ, "depends", nameArrayJ);}
+		json_object_object_add(sigJ, "depends", nameArrayJ);
 	else
-		{json_object_put(nameArrayJ);}
+		json_object_put(nameArrayJ);
 
-	if (!unit_.empty()) {json_object_object_add(sigJ, "unit", json_object_new_string(unit_.c_str()));}
+	if (!unit_.empty())
+		json_object_object_add(sigJ, "unit", json_object_new_string(unit_.c_str()));
 
-	if (frequency_) {json_object_object_add(sigJ, "frequency", json_object_new_double(frequency_));}
+	if (!metadata_)
+		json_object_object_add(sigJ, "metadata", json_object_get(metadata_));
 
-	if(timestamp_) {json_object_object_add(sigJ, "timestamp", json_object_new_int64(timestamp_));}
+	if (frequency_)
+		json_object_object_add(sigJ, "frequency", json_object_new_double(frequency_));
+
+	if(timestamp_)
+		json_object_object_add(sigJ, "timestamp", json_object_new_int64(timestamp_));
 
 	if (value_.hasBool) {json_object_object_add(sigJ, "value", json_object_new_boolean(value_.boolVal));}
 	else if (value_.hasNum) {json_object_object_add(sigJ, "value", json_object_new_double(value_.numVal));}

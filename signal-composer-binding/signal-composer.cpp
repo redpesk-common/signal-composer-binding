@@ -162,10 +162,9 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 	if(!getSignalsJ)
 	{
 		getSignalsJ = json_object_new_object();
-		std::string uri = "api://" + std::string(api);
-		std::string function = "subscribe";
-		json_object_object_add(getSignalsJ, "uri", json_object_new_string(uri.c_str()));
-		json_object_object_add(getSignalsJ, "function", json_object_new_string(function.c_str()));
+
+		std::string uri = "api://" + std::string(api) + "#subscribe";
+		json_object_object_add(getSignalsJ, "action", json_object_new_string(uri.c_str()));
 	}
 	getSignalsCtl = convert2Action("getSignals", getSignalsJ);
 

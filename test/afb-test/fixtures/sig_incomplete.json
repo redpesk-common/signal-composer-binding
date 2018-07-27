@@ -1,0 +1,19 @@
+{
+	"signals": [
+		{
+			"event": "txc/vehicle_speed",
+			"retention": 30,
+			"unit": "km/h",
+			"getSignalsArgs": {
+				"event": "vehicle_speed"
+			},
+			"onReceived": {
+				"action": "lua://convert#_Unit_Converter",
+				"args": {
+					"from": "km/h",
+					"to": "mi/h"
+				}
+			}
+		}
+	]
+}

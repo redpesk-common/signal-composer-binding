@@ -1,7 +1,7 @@
 ###########################################################################
-# Copyright 2017 IoT.bzh
+# Copyright 2018 IoT.bzh
 #
-# author: Fulup Ar Foll <fulup@iot.bzh>
+# author: Clément Malléjac <clementmallejac@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,17 +17,6 @@
 ###########################################################################
 
 
-##################################################
-# Control Policy Config file
-##################################################
-PROJECT_TARGET_ADD(lua.d)
-
-	file(GLOB LUA_FILES "*.lua")
-
-	add_input_files("${LUA_FILES}")
-
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-	LABELS "DATA"
-	OUTPUT_NAME ${TARGET_NAME}
-	)
-
+# Include any directory not starting with _
+# -----------------------------------------------------
+PROJECT_SUBDIRS_ADD(${PROJECT_SRC_DIR_PATTERN})

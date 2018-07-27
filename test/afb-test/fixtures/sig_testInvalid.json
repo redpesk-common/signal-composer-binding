@@ -1,0 +1,20 @@
+{
+	"signals": [
+		{
+			"uid": "invalidSignal",
+			"event": "txc/invalidSignal",
+			"retention": -1,
+			"unit": "invalidSignal",
+			"getSignalsArgs": {
+				"event": "invalidSignal"
+			},
+			"onReceived": {
+				"action": "lua://convert#_Unit_Converter",
+				"args": {
+					"from": "km/h",
+					"to": "mi/h"
+				}
+			}
+		}
+	]
+}

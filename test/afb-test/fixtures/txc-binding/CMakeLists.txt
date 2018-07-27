@@ -1,7 +1,8 @@
 ###########################################################################
-# Copyright 2017 IoT.bzh
+# Copyright 2015, 2016, 2017 IoT.bzh
 #
 # author: Fulup Ar Foll <fulup@iot.bzh>
+# contrib: Romain Forlot <romain.forlot@iot.bzh>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,18 +17,22 @@
 # limitations under the License.
 ###########################################################################
 
+# Add target to project dependency list
+PROJECT_TARGET_ADD(txc-binding)
 
-##################################################
-# Control Policy Config file
-##################################################
-PROJECT_TARGET_ADD(lua.d)
+	# Define project Targets
+	add_library(${TARGET_NAME} MODULE txc-binding.c)
 
-	file(GLOB LUA_FILES "*.lua")
-
-	add_input_files("${LUA_FILES}")
-
+	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-	LABELS "DATA"
-	OUTPUT_NAME ${TARGET_NAME}
+	SUFFIX ".ctlso"
+	PREFIX ""
+		LABELS "TEST-PLUGIN"
+		LINK_FLAGS ${BINDINGS_LINK_FLAG}
+		OUTPUT_NAME ${TARGET_NAME}
 	)
 
+	# Library dependencies (include updates automatically)
+	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+		ctl-utilities
+		${link_libraries})

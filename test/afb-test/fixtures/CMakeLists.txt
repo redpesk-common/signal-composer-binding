@@ -1,7 +1,7 @@
 ###########################################################################
-# Copyright 2017 IoT.bzh
+# Copyright 2018 IoT.bzh
 #
-# author: Fulup Ar Foll <fulup@iot.bzh>
+# author: Clément Malléjac <clementmallejac@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@
 
 
 ##################################################
-# Control Policy Config file
+# Signal-Composer Test Fixtures
 ##################################################
-PROJECT_TARGET_ADD(lua.d)
+PROJECT_TARGET_ADD(data-files)
 
-	file(GLOB LUA_FILES "*.lua")
-
-	add_input_files("${LUA_FILES}")
+	file(GLOB DATA_FILES "*.json")
+	add_input_files("${DATA_FILES}")
 
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-	LABELS "DATA"
+	LABELS "TEST-DATA"
 	OUTPUT_NAME ${TARGET_NAME}
 	)
 
+PROJECT_SUBDIRS_ADD(${PROJECT_SRC_DIR_PATTERN})

@@ -1,0 +1,49 @@
+{
+    "id": "http://iot.bzh/download/public/schema/json/ctl-schema.json#",
+    "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json#",
+    "metadata": {
+        "uid": "Test",
+        "version": "1.0",
+        "api": "aft-signal-composer",
+        "info": "AFB-test binding configuration file to test signal-composer api.",
+        "require": [
+            "signal-composer"
+        ]
+    },
+    "testVerb": {
+        "uid": "launch_all_tests",
+        "info": "Launch all the tests",
+        "action": "lua://AFT#_launch_test",
+        "args": {
+            "trace": "signal-composer",
+            "files": ["signal-composer_BasicAPITest.lua"]
+        }
+    },
+    "mapis": [{
+        "uid": "txc-binding",
+        "info": "Faked txc-binding API",
+        "libs": "txc-binding.c",
+        "verbs": [
+            {
+                "uid": "subscribe",
+                "info": "Subscribe to signals events",
+                "action": "plugin://txc-binding#subscribe"
+            },
+            {
+                "uid": "unsubscribe",
+                "info": "Unsubscribe previously suscribed signals.",
+                "action": "plugin://txc-binding#unsubscribe"
+            },
+            {
+                "uid": "start",
+                "info": "Start playing trace file.",
+                "action": "plugin://txc-binding#start"
+            },
+            {
+                "uid": "stop",
+                "info": "Start playing trace file.",
+                "action": "plugin://txc-binding#stop"
+            }
+        ]
+    }]
+}

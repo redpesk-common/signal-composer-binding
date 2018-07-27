@@ -78,7 +78,7 @@ set (PKG_REQUIRED_LIST
 # Prefix path where will be installed the files
 # Default: /usr/local (need root permission to write in)
 # ------------------------------------------------------
-set(INSTALL_PREFIX $ENV{HOME}/opt)
+set(INSTALL_PREFIX $ENV{HOME}/opt/AGL)
 
 # Customize link option
 # -----------------------------
@@ -112,10 +112,10 @@ list(APPEND link_libraries afb-helpers)
 # -pg
 # -Wp,-U_FORTIFY_SOURCE
 # CACHE STRING "Compilation flags for PROFILING build type.")
-#set(DEBUG_COMPILE_OPTIONS
-# -g
-# -ggdb
-# -Wp,-U_FORTIFY_SOURCE
+# set(DEBUG_COMPILE_OPTIONS
+#  -g
+#  -ggdb
+#  -Wp,-U_FORTIFY_SOURCE
 # CACHE STRING "Compilation flags for DEBUG build type.")
 #set(CCOV_COMPILE_OPTIONS
 # -g

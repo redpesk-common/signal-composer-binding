@@ -372,38 +372,34 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 
 void Composer::processOptions(const std::map<std::string, int>& opts, std::shared_ptr<Signal> sig, json_object* response) const
 {
-	for(const auto& o: opts)
+	json_object *value = nullptr;
+	if (opts.at("average"))
 	{
-		bool avg = false, min = false, max = false, last = false;
-		if (o.first.compare("average") && !avg)
-		{
-			avg = true;
-			double value = sig->average(o.second);
-			json_object_object_add(response, "value", json_object_new_double(value));
-		}
-		else if (o.first.compare("minimum") && !min)
-		{
-			min = true;
-			double value = sig->minimum();
-			json_object_object_add(response, "value", json_object_new_double(value));
-		}
-		else if (o.first.compare("maximum") && !max)
-		{
-			max = true;
-			double value = sig->maximum();
-			json_object_object_add(response, "value", json_object_new_double(value));
-		}
-		else if (o.first.compare("last") && !last)
-		{
-			last = true;
-			json_object* value = sig->last_value();
-			json_object_object_add(response, "value", value);
-		}
-		else
-		{
-			json_object_object_add(response, "value",
-				json_object_new_string("No recorded value so far."));
-		}
+		value = sig->average(opts.at("average"));
+		json_object_is_type(value, json_type_double) ?
+			json_object_object_add(response, "average", value) :
+			json_object_object_add(response, "error", value);
+	}
+	if (opts.at("minimum"))
+	{
+		value = sig->minimum(opts.at("minimum"));
+		json_object_is_type(value, json_type_double) ?
+			json_object_object_add(response, "minimum", value) :
+			json_object_object_add(response, "error", value);
+	}
+	if (opts.at("maximum"))
+	{
+		value = sig->minimum(opts.at("maximum"));
+		json_object_is_type(value, json_type_double) ?
+			json_object_object_add(response, "maximum", value) :
+			json_object_object_add(response, "error", value);
+	}
+	if (opts.at("last"))
+	{
+		value = sig->minimum(opts.at("last"));
+		json_object_is_type(value, json_type_null) ?
+			json_object_object_add(response, "error", value) :
+			json_object_object_add(response, "last", value);
 	}
 }
 
@@ -566,11 +562,17 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 	std::map<std::string, int> opts;
 	json_object *response = nullptr, *finalResponse = json_object_new_array();
 
-	wrap_json_unpack(options, "{s?i, s?i, s?i, s?i !}",
+	if(options && wrap_json_unpack(options, "{s?i, s?i, s?i, s?i !}",
 		"average", &opts["average"],
 		"minimum", &opts["minimum"],
 		"maximum", &opts["maximum"],
-		"last", &opts["last"]);
+		"last", &opts["last"]))
+	{
+		response = json_object_new_object();
+		json_object_object_add(response, "error", json_object_new_string("Invalid options specified. Use the following: 'options': {['average': nb_seconds,] ['minimum': nb_seconds,] ['maximum': nb_seconds] }"));
+		json_object_array_add(finalResponse, response);
+		return finalResponse;
+	}
 
 	std::vector<std::shared_ptr<Signal>> sigP = searchSignals(sig);
 	if(!sigP.empty())

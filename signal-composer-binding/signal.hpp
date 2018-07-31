@@ -87,9 +87,9 @@ public:
 	void onReceivedCB(json_object *eventJ);
 	void attachToSourceSignals(Composer& composer);
 
-	double average(int seconds = 0) const;
-	double minimum(int seconds = 0) const;
-	double maximum(int seconds = 0) const;
+	json_object* average(int seconds = 0) const;
+	json_object* minimum(int seconds = 0) const;
+	json_object* maximum(int seconds = 0) const;
 	json_object* last_value() const;
 	uint64_t last_timestamp() const;
 

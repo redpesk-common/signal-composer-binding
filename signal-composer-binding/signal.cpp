@@ -18,6 +18,7 @@
 #include <float.h>
 #include <string.h>
 #include <fnmatch.h>
+#include <sstream>
 
 #include "signal.hpp"
 #include "signal-composer.hpp"
@@ -358,8 +359,8 @@ void Signal::attachToSourceSignals(Composer& composer)
 ///
 /// @param[in] seconds - period to calculate the average
 ///
-/// @return Average value
-double Signal::average(int seconds) const
+/// @return A json_object with the Average value or an error message
+json_object * Signal::average(int seconds) const
 {
 	uint64_t begin = history_.begin()->first;
 	uint64_t end = seconds ?
@@ -367,6 +368,13 @@ double Signal::average(int seconds) const
 		history_.rbegin()->first;
 	double total = 0.0;
 	int nbElt = 0;
+	std::stringstream errorMsg;
+
+	if(history_.empty() && seconds < 0)
+	{
+		errorMsg << "There are no historized values or you requested a negative time interval for that signal: " << id_;
+		return json_object_new_string(errorMsg.str().c_str());
+	}
 
 	for(const auto& val: history_)
 	{
@@ -383,29 +391,22 @@ double Signal::average(int seconds) const
 					total += json_object_get_double(val.second);
 					break;
 				default:
-					AFB_ERROR("The stored value '%s' for the signal '%s' isn't numeric, it is not possible to compute an average value.", json_object_get_string(val.second), id_.c_str());
-					break;
+					errorMsg << "The stored value '" << json_object_get_string(val.second) << "' for the signal '" << id_ << "'' isn't numeric, it is not possible to compute an average value.";
+					return json_object_new_string(errorMsg.str().c_str());
 			}
 			nbElt++;
 		}
-		else
-		{
-			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value: %s",
-			id_.c_str(),
-			json_object_get_string(val.second));
-			break;
-		}
 	}
 
-	return total / nbElt;
+	return json_object_new_double(total / nbElt);
 }
 
 /// @brief Find minimum in the recorded values
 ///
 /// @param[in] seconds - period to find the minimum
 ///
-/// @return Minimum value contained in the history
-double Signal::minimum(int seconds) const
+/// @return A json_object with  the Minimum value contained in the history or the error string
+json_object *Signal::minimum(int seconds) const
 {
 	uint64_t begin = history_.begin()->first;
 	uint64_t end = seconds ?
@@ -414,6 +415,14 @@ double Signal::minimum(int seconds) const
 	double current = 0.0;
 
 	double min = DBL_MAX;
+	std::stringstream errorMsg;
+
+	if(history_.empty() && seconds < 0)
+	{
+		errorMsg << "There is no historized values or you requested a negative time interval for that signal: " << id_;
+		return json_object_new_string(errorMsg.str().c_str());
+	}
+
 	for(const auto& val : history_)
 	{
 		if(val.first >= end) {
@@ -430,27 +439,21 @@ double Signal::minimum(int seconds) const
 					min = current < min ? current : min;
 					break;
 				default:
-					AFB_ERROR("The stored value '%s' for signal '%s' isn't numeric, it is not possible to find a minimum value.", json_object_get_string(val.second), id_.c_str());
-					break;
+					errorMsg << "The stored value '" << json_object_get_string(val.second) << "' for the signal '" << id_ << "'' isn't numeric, it is not possible to find a minimum value.";
+					return json_object_new_string(errorMsg.str().c_str());
 			}
 		}
-		else
-		{
-			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value: %s",
-			id_.c_str(),
-			json_object_get_string(val.second));
-			break;
-		}
 	}
-	return min;
+
+	return json_object_new_double(min);
 }
 
 /// @brief Find maximum in the recorded values
 ///
 /// @param[in] seconds - period to find the maximum
 ///
-/// @return Maximum value contained in the history
-double Signal::maximum(int seconds) const
+/// @return A json_object with Maximum value contained in the history or an error string
+json_object * Signal::maximum(int seconds) const
 {
 	uint64_t begin = history_.begin()->first;
 	uint64_t end = seconds ?
@@ -459,6 +462,13 @@ double Signal::maximum(int seconds) const
 	double current = 0.0;
 
 	double max = 0.0;
+	std::stringstream errorMsg;
+
+	if(history_.empty() && seconds < 0) {
+		errorMsg << "There is no historized values or you requested a negative time interval for that signal: " << id_;
+		return json_object_new_string(errorMsg.str().c_str());
+	}
+
 	for(const auto& val : history_)
 	{
 		if(val.first >= end) {
@@ -475,19 +485,13 @@ double Signal::maximum(int seconds) const
 					max = current > max ? current : max;
 					break;
 				default:
-					AFB_ERROR("The stored value '%s' for signal '%s' isn't numeric, it is not possible to find a maximum value.", json_object_get_string(val.second), id_.c_str());
-					break;
+					errorMsg << "The stored value '" << json_object_get_string(val.second) << "' for the signal '" << id_ << "'' isn't numeric, it is not possible to find a maximum value.";
+					return json_object_new_string(errorMsg.str().c_str());
 			}
 		}
-		else
-		{
-			AFB_ERROR("There isn't numerical value to compare with in that signal '%s'. Stored value: %s",
-			id_.c_str(),
-			json_object_get_string(val.second));
-			break;
-		}
 	}
-	return max;
+
+	return json_object_new_double(max);
 }
 
 /// @brief Return last value recorded

@@ -236,9 +236,10 @@ void list(afb_req request)
 /// @brief entry point for get requests.
 void get(struct afb_req request)
 {
-	int err = 0;
+	int err = 0, i = 0;
+	size_t l = 0;
 	struct json_object* args = afb_req_json(request), *ans = nullptr,
-	*options = nullptr;
+	*options = nullptr, *error = nullptr, *object = nullptr;
 	const char* sig;
 
 	// Process about Raw CAN message on CAN bus directly
@@ -246,15 +247,24 @@ void get(struct afb_req request)
 			"options", &options);
 	if(err)
 	{
-		AFB_ERROR("Can't process your request '%s'. Valid arguments are: string for 'signal' and JSON object for 'options' (optionnal)", json_object_to_json_string_ext(args, JSON_C_TO_STRING_PRETTY));
-		afb_req_fail(request, "error", NULL);
+		afb_req_fail(request, "error", "Valid arguments are:{'signal': 'wantedsignal'[, 'options': {['average': nb_seconds,] ['minimum': nb_seconds,] ['maximum': nb_seconds] }]");
 		return;
 	}
 
 	ans = Composer::instance().getsignalValue(sig, options);
 
-	if (json_object_array_length(ans))
-		afb_req_success(request, ans, NULL);
+	l = json_object_array_length(ans);
+	if(l) {
+		while(i < l) {
+			object = json_object_array_get_idx(ans, i++);
+			if(json_object_object_get_ex(object, "error", &error))
+				break;
+		}
+		if(error)
+			afb_req_fail(request, "error", json_object_get_string(error));
+		else
+			afb_req_success(request, ans, NULL);
+	}
 	else
 		afb_req_fail(request, "error", "No signals found.");
 

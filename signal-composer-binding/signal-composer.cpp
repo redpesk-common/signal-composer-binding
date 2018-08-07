@@ -37,22 +37,6 @@ extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, json_obj
 	sig->set(timestamp, value);
 }
 
-bool startsWith(const std::string& str, const std::string& pattern)
-{
-	size_t sep;
-	if( (sep = str.find(pattern)) != std::string::npos && !sep)
-		{return true;}
-	return false;
-}
-
-void extractString(void* closure, json_object* object)
-{
-	std::vector<std::string> *files = (std::vector<std::string>*) closure;
-	const char *oneFile = json_object_get_string(object);
-
-	files->push_back(oneFile);
-}
-
 // aSignal member value will be initialized in sourceAPI->addSignal()
 static struct signalCBT pluginHandle = {
 	.searchNsetSignalValue = searchNsetSignalValueHandle,
@@ -389,14 +373,14 @@ void Composer::processOptions(const std::map<std::string, int>& opts, std::share
 	}
 	if (opts.at("maximum"))
 	{
-		value = sig->minimum(opts.at("maximum"));
+		value = sig->maximum(opts.at("maximum"));
 		json_object_is_type(value, json_type_double) ?
 			json_object_object_add(response, "maximum", value) :
 			json_object_object_add(response, "error", value);
 	}
 	if (opts.at("last"))
 	{
-		value = sig->minimum(opts.at("last"));
+		value = sig->last_value();
 		json_object_is_type(value, json_type_null) ?
 			json_object_object_add(response, "error", value) :
 			json_object_object_add(response, "last", value);

@@ -211,7 +211,6 @@ void addObjects(afb_req request)
 				return;
 			}
 		}
-		json_object_put(objectsJ);
 		afb_req_success(request, NULL, NULL);
 	}
 	else

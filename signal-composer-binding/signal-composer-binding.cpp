@@ -181,9 +181,17 @@ void addObjects(afb_req request)
 		if(!objectsJ)
 		{
 			json_object* responseJ = ScanForConfig(CONTROL_CONFIG_PATH, CTL_SCAN_RECURSIVE, filepath, ".json");
-			filepath = ConfigSearch(nullptr, responseJ);
-			if(filepath)
-				{objectsJ = json_object_from_file(filepath);}
+			if(responseJ)
+			{
+				filepath = ConfigSearch(nullptr, responseJ);
+				if(filepath)
+					{objectsJ = json_object_from_file(filepath);}
+			}
+			else
+			{
+				afb_req_fail_f(request, "Fail to find file: %s", filepath);
+				return;
+			}
 		}
 	}
 	else
@@ -194,10 +202,9 @@ void addObjects(afb_req request)
 		json_object_object_get_ex(objectsJ, "sources", &sourcesJ);
 		json_object_object_get_ex(objectsJ, "signals", &signalsJ);
 
-		if( sourcesJ && composer.loadSources(sourcesJ))
+		if(sourcesJ && composer.loadSources(sourcesJ))
 		{
 			afb_req_fail_f(request, "Loading 'sources' configuration or subscription error", "Error code: -2");
-			json_object_put(objectsJ);
 			return;
 		}
 		if(signalsJ)
@@ -207,7 +214,6 @@ void addObjects(afb_req request)
 			else
 			{
 				afb_req_fail_f(request, "Loading 'signals' configuration or subscription error", "Error code: -2");
-				json_object_put(objectsJ);
 				return;
 			}
 		}

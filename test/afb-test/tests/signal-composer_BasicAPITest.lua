@@ -61,7 +61,7 @@ _AFT.testVerbStatusSuccess(testPrefix.."getFilterMax","signal-composer","get",{s
 --[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing the path of a json containing signals
 	 then making a get, a subscribe, and an unsubscribe looking for any misbehaviour from signals added with the verb ]]
 _AFT.describe(testPrefix.."addObjectsByFile",function()
-    _AFT.assertVerbStatusSuccess("signal-composer","addObjects",{file = _AFT.bindingRootDir.."var/sig_test.json"})
+    _AFT.assertVerbStatusSuccess("signal-composer","addObjects",{file = _AFT.bindingRootDir.."/var/sig_test.json"})
     _AFT.assertVerbStatusSuccess("signal-composer","get",{signal= "vehicle_speedTest1",options= {average=10}});
     _AFT.assertVerbStatusSuccess("signal-composer","subscribe",{ signal = "vehicle_speedTest1"});
 	_AFT.assertVerbStatusSuccess("signal-composer","unsubscribe",{ signal = "vehicle_speedTest1"});

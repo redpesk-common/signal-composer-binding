@@ -5,7 +5,7 @@
 		"version": "1.0",
 		"api": "signal-composer",
 		"info": "Signal composer Configuration",
-		"require": ["txc"]
+		"require": ["txc-binding"]
 	},
 	"plugins": [
 		{

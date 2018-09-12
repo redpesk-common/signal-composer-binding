@@ -2,15 +2,15 @@
 	"$schema": "http://iot.bzh/download/public/schema/json/signal-composer-schema.json",
 	"sources": [
 		{
-			"uid": "TXC-demo",
-			"api": "txc",
-			"info": "Use TXC demo binding as signals provider",
+			"uid": "txc-binding-demo",
+			"api": "txc-binding",
+			"info": "Use txc-binding demo binding as signals provider",
 			"init": {
-				"action": "api://txc#start",
+				"action": "api://txc-binding#start",
 				"args": {"filename": "var/nyc-downtown-crosstown.json"}
 			},
 			"getSignals": {
-				"action": "api://txc#subscribe"
+				"action": "api://txc-binding#subscribe"
 			}
 		}
 	]

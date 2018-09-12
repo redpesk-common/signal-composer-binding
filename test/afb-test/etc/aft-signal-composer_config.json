@@ -22,7 +22,7 @@
     "mapis": [{
         "uid": "txc-binding",
         "info": "Faked txc-binding API",
-        "libs": "txc-binding.c",
+        "libs": "txc-binding.ctlso",
         "verbs": [
             {
                 "uid": "subscribe",

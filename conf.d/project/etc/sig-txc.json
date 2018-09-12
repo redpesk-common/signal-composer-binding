@@ -3,7 +3,7 @@
 	"signals": [
 		{
 			"uid": "vehicle_speed",
-			"event": "txc/vehicle_speed",
+			"event": "txc-binding/vehicle_speed",
 			"retention": 30,
 			"unit": "km/h",
 			"getSignalsArgs": {
@@ -19,7 +19,7 @@
 		},
 		{
 			"uid": "engine_speed",
-			"event": "txc/engine_speed",
+			"event": "txc-binding/engine_speed",
 			"retention": 30,
 			"unit": "rpm",
 			"getSignalsArgs": {
@@ -28,7 +28,7 @@
 		},
 		{
 			"uid": "fuel_level",
-			"event": "txc/fuel_level",
+			"event": "txc-binding/fuel_level",
 			"retention": 30,
 			"unit": "liter",
 			"getSignalsArgs": {
@@ -37,7 +37,7 @@
 		},
 		{
 			"uid": "accelerator_pedal_position",
-			"event": "txc/accelerator_pedal_position",
+			"event": "txc-binding/accelerator_pedal_position",
 			"retention": 30,
 			"getSignalsArgs": {
 				"event": "accelerator_pedal_position"
@@ -45,7 +45,7 @@
 		},
 		{
 			"uid": "torque_at_transmission",
-			"event": "txc/torque_at_transmission",
+			"event": "txc-binding/torque_at_transmission",
 			"retention": 30,
 			"unit": "Nm",
 			"getSignalsArgs": {
@@ -54,7 +54,7 @@
 		},
 		{
 			"uid": "steering_wheel_angle",
-			"event": "txc/steering_wheel_angle",
+			"event": "txc-binding/steering_wheel_angle",
 			"retention": 30,
 			"unit": "degrees",
 			"getSignalsArgs": {
@@ -63,7 +63,7 @@
 		},
 		{
 			"uid": "fuel_consumed_since_restart",
-			"event": "txc/fuel_consumed_since_restart",
+			"event": "txc-binding/fuel_consumed_since_restart",
 			"retention": 30,
 			"unit": "liter",
 			"getSignalsArgs": {
@@ -72,7 +72,7 @@
 		},
 		{
 			"uid": "odometer",
-			"event": "txc/odometer",
+			"event": "txc-binding/odometer",
 			"retention": 30,
 			"unit": "km",
 			"getSignalsArgs": {
@@ -81,7 +81,7 @@
 		},
 		{
 			"uid": "latitude",
-			"event": "txc/latitude",
+			"event": "txc-binding/latitude",
 			"retention": 30,
 			"unit": "degrees",
 			"getSignalsArgs": {
@@ -90,7 +90,7 @@
 		},
 		{
 			"uid": "longitude",
-			"event": "txc/longitude",
+			"event": "txc-binding/longitude",
 			"retention": 30,
 			"unit": "degrees",
 			"getSignalsArgs": {

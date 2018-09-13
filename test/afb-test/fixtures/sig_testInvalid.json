@@ -2,7 +2,7 @@
 	"signals": [
 		{
 			"uid": "invalidSignal",
-			"event": "txc/invalidSignal",
+			"event": "txc-binding/invalidSignal",
 			"retention": -1,
 			"unit": "invalidSignal",
 			"getSignalsArgs": {

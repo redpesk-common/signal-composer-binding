@@ -35,7 +35,7 @@ CTLP_LUA_REGISTER("txc-binding");
 
 struct signal {
 	const char *name;
-	struct afb_event event;
+	afb_event_t event;
 };
 
 static int playing;
@@ -96,10 +96,17 @@ static void send_trace(const char *name, struct json_object *object)
 	}
 }
 
+struct playTracesArgs {
+	struct json_object* jArgs;
+	afb_api_t apiHandle;
+};
+
 static void *play_traces(void *opaque)
 {
 	int len, fd;
-	struct json_object *args = opaque;
+	struct playTracesArgs *ptArgs = (struct playTracesArgs*)opaque;
+	struct json_object *args = ptArgs->jArgs;
+	afb_api_t apiHandle = ptArgs->apiHandle;
 	struct json_tokener *tokener = NULL;
 	struct json_object *object;
 	char line[1024];
@@ -135,7 +142,7 @@ static void *play_traces(void *opaque)
 		info = "can't find filename";
 		goto end;
 	}
-	fd = afb_daemon_rootdir_open_locale(json_object_get_string(object), O_RDONLY, NULL);
+	fd = afb_api_rootdir_open_locale(apiHandle, json_object_get_string(object), O_RDONLY, NULL);
 	if (fd < 0) {
 		info = "can't open the file";
 		goto end;
@@ -213,7 +220,6 @@ end:
 	return NULL;
 }
 
-
 CTLP_CAPI (start, source, argsJ, eventJ)
 {
 	struct json_object *args, *a;
@@ -226,7 +232,7 @@ CTLP_CAPI (start, source, argsJ, eventJ)
 		afb_req_fail(source->request, "error", "argument 'filename' is missing");
 		return -1;
 	}
-	fd = afb_daemon_rootdir_open_locale(json_object_get_string(a), O_RDONLY, NULL);
+	fd = afb_api_rootdir_open_locale(source->api, json_object_get_string(a), O_RDONLY, NULL);
 	if (fd < 0) {
 		afb_req_fail(source->request, "error", "argument 'filename' is not a readable file");
 		return -1;
@@ -250,7 +256,8 @@ CTLP_CAPI (start, source, argsJ, eventJ)
 	/* valid then try to start */
 	playing = 1;
 	stoping = 0;
-	if (pthread_create(&tid, NULL, play_traces, json_object_get(args)) != 0) {
+	struct playTracesArgs ptArgs = { json_object_get(args), source->api};
+	if (pthread_create(&tid, NULL, play_traces, &ptArgs) != 0) {
 		playing = 0;
 		afb_req_fail(source->request, "error", "can't start to play");
 		return -1;
@@ -269,12 +276,12 @@ CTLP_CAPI (stop, source, argsJ, eventJ)
 	return 0;
 }
 
-static int subscribe_unsubscribe_sig(struct afb_req request, int subscribe, struct signal *sig)
+static int subscribe_unsubscribe_sig(afb_api_t apiHandle, afb_req_t request, int subscribe, struct signal *sig)
 {
 	if (!afb_event_is_valid(sig->event)) {
 		if (!subscribe)
 			return 1;
-		sig->event = afb_daemon_make_event(sig->name);
+		sig->event = afb_api_make_event(apiHandle, sig->name);
 		if (!afb_event_is_valid(sig->event)) {
 			return 0;
 		}
@@ -287,33 +294,33 @@ static int subscribe_unsubscribe_sig(struct afb_req request, int subscribe, stru
 	return 1;
 }
 
-static int subscribe_unsubscribe_all(struct afb_req request, int subscribe)
+static int subscribe_unsubscribe_all(afb_api_t apiHandle, afb_req_t request, int subscribe)
 {
 	int i, n, e;
 
 	n = sizeof signals / sizeof * signals;
 	e = 0;
 	for (i = 0 ; i < n ; i++)
-		e += !subscribe_unsubscribe_sig(request, subscribe, &signals[i]);
+		e += !subscribe_unsubscribe_sig(apiHandle, request, subscribe, &signals[i]);
 	return e == 0;
 }
 
-static int subscribe_unsubscribe_name(struct afb_req request, int subscribe, const char *name)
+static int subscribe_unsubscribe_name(afb_api_t apiHandle, afb_req_t request, int subscribe, const char *name)
 {
 	struct signal *sig;
 
 	if (0 == strcmp(name, "*"))
-		return subscribe_unsubscribe_all(request, subscribe);
+		return subscribe_unsubscribe_all(apiHandle, request, subscribe);
 
 	sig = getsig(name);
 	if (sig == NULL) {
 		return 0;
 	}
 
-	return subscribe_unsubscribe_sig(request, subscribe, sig);
+	return subscribe_unsubscribe_sig(apiHandle, request, subscribe, sig);
 }
 
-static void subscribe_unsubscribe(struct afb_req request, int subscribe)
+static void subscribe_unsubscribe(afb_api_t apiHandle, afb_req_t request, int subscribe)
 {
 	int ok, i;
 	size_t n;
@@ -322,15 +329,15 @@ static void subscribe_unsubscribe(struct afb_req request, int subscribe)
 	/* makes the subscription/unsubscription */
 	args = afb_req_json(request);
 	if (args == NULL || !json_object_object_get_ex(args, "event", &a)) {
-		ok = subscribe_unsubscribe_all(request, subscribe);
+		ok = subscribe_unsubscribe_all(apiHandle, request, subscribe);
 	} else if (json_object_get_type(a) != json_type_array) {
-		ok = subscribe_unsubscribe_name(request, subscribe, json_object_get_string(a));
+		ok = subscribe_unsubscribe_name(apiHandle, request, subscribe, json_object_get_string(a));
 	} else {
 		n = json_object_array_length(a);
 		ok = 0;
 		for (i = 0 ; i < n ; i++) {
 			x = json_object_array_get_idx(a, i);
-			if (subscribe_unsubscribe_name(request, subscribe, json_object_get_string(x)))
+			if (subscribe_unsubscribe_name(apiHandle, request, subscribe, json_object_get_string(x)))
 				ok++;
 		}
 		ok = (ok == n);
@@ -346,11 +353,11 @@ static void subscribe_unsubscribe(struct afb_req request, int subscribe)
 }
 
 CTLP_CAPI (subscribe, source, argsJ, eventJ){
-	subscribe_unsubscribe(source->request, 1);
+	subscribe_unsubscribe(source->api, source->request, 1);
 	return 0;
 }
 
 CTLP_CAPI (unsubscribe, source, argsJ, eventJ){
-	subscribe_unsubscribe(source->request, 0);
+	subscribe_unsubscribe(source->api, source->request, 0);
 	return 0;
 }

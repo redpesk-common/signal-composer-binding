@@ -1,7 +1,7 @@
 {
 	"signals": [
 		{
-			"event": "txc/vehicle_speed",
+			"event": "txc-binding/vehicle_speed",
 			"retention": 30,
 			"unit": "km/h",
 			"getSignalsArgs": {

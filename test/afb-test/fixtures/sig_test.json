@@ -2,7 +2,7 @@
 	"signals": [
 		{
 			"uid": "vehicle_speedTest1",
-			"event": "txc/vehicle_speed",
+			"event": "txc-binding/vehicle_speed",
 			"retention": 30,
 			"unit": "km/h",
 			"getSignalsArgs": {
@@ -18,7 +18,7 @@
 		},
 		{
 			"uid": "engine_speedTest2",
-			"event": "txc/engine_speed",
+			"event": "txc-binding/engine_speed",
 			"retention": 30,
 			"unit": "rpm",
 			"getSignalsArgs": {

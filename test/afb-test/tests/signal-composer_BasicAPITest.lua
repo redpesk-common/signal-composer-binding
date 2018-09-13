@@ -79,7 +79,7 @@ _AFT.testVerbStatusSuccess(testPrefix.."addObjectsDirect","signal-composer","add
 	signals=  {
 		{
 			uid=  "vehicle_speedTest3",
-			event=  "txc/vehicle_speed",
+			event=  "txc-binding/vehicle_speed",
 			retention=  30,
 			unit=  "km/h",
 			getSignalsArgs=  {
@@ -95,7 +95,7 @@ _AFT.testVerbStatusSuccess(testPrefix.."addObjectsDirect","signal-composer","add
 		},
 		{
 			uid=  "engine_speedTest4",
-			event=  "txc/engine_speed",
+			event=  "txc-binding/engine_speed",
 			retention=  30,
 			unit=  "rpm",
 			getSignalsArgs=  {
@@ -113,7 +113,7 @@ _AFT.testVerbStatusError(testPrefix.."addObjectsDirect_InvalidSignal","signal-co
 	signals=  {
 		{
 			uid=  "invalidSignal",
-			event=  "txc/invalidSignal",
+			event=  "txc-binding/invalidSignal",
 			retention=  -1,
 			unit=  "invalidSignal",
 			getSignalsArgs=  {
@@ -137,7 +137,7 @@ _AFT.testVerbStatusError(testPrefix.."addObjectsDirect_MissingField","signal-com
 {
 	signals=  {
 		{
-			event=  "txc/invalidSignal2",
+			event=  "txc-binding/invalidSignal2",
 			retention=  30,
 			unit=  "km/h",
 			getSignalsArgs=  {
@@ -157,11 +157,11 @@ _AFT.testVerbStatusError(testPrefix.."addObjectsDirect_MissingField","signal-com
 
 --[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing the path of a json containing signals
 	This one has invalid values for most of its field, the binding should not be able to add it ]]
-_AFT.testVerbStatusError(testPrefix.."addObjectsByFile_InvalidSignal","signal-composer","addObjects",{file = _AFT.bindingRootDir.."var/sig_testInvalid.json"});
+_AFT.testVerbStatusError(testPrefix.."addObjectsByFile_InvalidSignal","signal-composer","addObjects",{file = _AFT.bindingRootDir.."/var/sig_testInvalid.json"});
 
 --[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing the path of a json containing signals
 	This one is missing the mandatory 'uid' field, the binding should not be able to add it ]]
-_AFT.testVerbStatusError(testPrefix.."addObjectsByFile_Missingfield","signal-composer","addObjects",{file = _AFT.bindingRootDir.."var/sig_incomplete.json"});
+_AFT.testVerbStatusError(testPrefix.."addObjectsByFile_Missingfield","signal-composer","addObjects",{file = _AFT.bindingRootDir.."/var/sig_incomplete.json"});
 
 -- This tests the 'subscribe' verb of the signal-composer API, with a non existing signal, it should reply with an error
 _AFT.testVerbStatusError(testPrefix.."subscribeNonExistingSignal","signal-composer","subscribe",{ signal = "notASignal"});

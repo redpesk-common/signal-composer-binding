@@ -27,9 +27,9 @@ ${BINDER} 	--name="${PROCNAME}" \
             --port="${PORT}" \
 			--tracereq=common \
 			--token=${TOKEN} \
-			--workdir="${BUILDDIR}" \
+			--workdir="${BUILDDIR}/package-test" \
             --binding=${AFBTEST} \
-			--binding="package/lib/afb-signal-composer.so" \
+			--binding="../package/lib/afb-signal-composer.so" \
             -vvv \
             --call="aft-signal-composer/launch_all_tests:{}" \
             --call="aft-signal-composer/exit:{}"

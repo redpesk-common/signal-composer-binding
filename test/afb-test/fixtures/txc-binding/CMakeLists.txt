@@ -20,6 +20,8 @@
 # Add target to project dependency list
 PROJECT_TARGET_ADD(txc-binding)
 
+	add_definitions(-DAFB_BINDING_VERSION=3)
+
 	# Define project Targets
 	add_library(${TARGET_NAME} MODULE txc-binding.c)
 

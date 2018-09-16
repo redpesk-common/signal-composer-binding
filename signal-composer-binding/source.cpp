@@ -141,8 +141,25 @@ std::vector<std::shared_ptr<Signal>> SourceAPI::searchSignals(const std::string&
 	return signals;
 }
 
-void SourceAPI::makeSubscription()
+int SourceAPI::cleanNotSubscribedSignals() {
+	int erased = 0;
+	for(auto sig = signalsM_.begin(); sig != signalsM_.end();)
+	{
+		if(!sig->second->subscribed_)
+		{
+			sig = signalsM_.erase(sig);
+			erased++;
+		}
+		else
+			{sig++;}
+	}
+
+	return erased;
+}
+
+int SourceAPI::makeSubscription()
 {
+	int err = 0;
 	if(getSignals_)
 	{
 		CtlSourceT source;
@@ -168,13 +185,18 @@ void SourceAPI::makeSubscription()
 				getSignals_->argsJ = sig.second->getSignalsArgs() ?
 					sig.second->getSignalsArgs() :
 					argsSaveJ;
-				ActionExecOne(&source, getSignals_, signalJ);
-				// Considerate signal subscribed no matter what
-				sig.second->subscribed_ = true;
+
+				sig.second->subscribed_ = ActionExecOne(&source, getSignals_, signalJ) ? false : true;
 			}
 		}
+		err += cleanNotSubscribedSignals();
 		getSignals_->argsJ = argsSaveJ;
 		source.uid = uid_.c_str();
 		ActionExecOne(&source, getSignals_, nullptr);
 	}
+
+	if(err)
+		{AFB_ERROR("%d signal(s) removed because invalid. Please review your signal definition.", err);}
+
+	return err;
 }

@@ -42,7 +42,7 @@ private:
 	int loadOneSignal(json_object* signalsJ);
 	static int loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object *signalsJ);
 
-	void execSignalsSubscription();
+	int execSignalsSubscription();
 	std::shared_ptr<SourceAPI> getSourceAPI(const std::string& api);
 	void processOptions(const std::map<std::string, int>& opts, std::shared_ptr<Signal> sig, json_object* response) const;
 public:
@@ -52,7 +52,7 @@ public:
 	int loadConfig(std::string& filepath);
 	int loadSources(json_object* sourcesJ);
 	int loadSignals(json_object* signalsJ);
-	void initSignals();
+	int initSignals();
 	void initSourcesAPI();
 
 	CtlConfigT* ctlConfig();

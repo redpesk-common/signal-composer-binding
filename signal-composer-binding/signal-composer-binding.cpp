@@ -211,13 +211,19 @@ void addObjects(afb_req request)
 
 		if(sourcesJ && composer.loadSources(sourcesJ))
 		{
-			afb_req_fail_f(request, "Loading 'sources' configuration or subscription error", "Error code: -2");
+			afb_req_fail_f(request, "Loading 'sources' configuration or subscription error", "Error code: -4");
 			return;
 		}
 		if(signalsJ)
 		{
 			if(!composer.loadSignals(signalsJ))
-				{composer.initSignals();}
+			{
+				if(composer.initSignals())
+				{
+					afb_req_fail_f(request, "Loading 'signals' configuration or subscription error", "Error code: -3");
+					return;
+				}
+			}
 			else
 			{
 				afb_req_fail_f(request, "Loading 'signals' configuration or subscription error", "Error code: -2");

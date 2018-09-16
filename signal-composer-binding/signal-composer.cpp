@@ -480,14 +480,14 @@ void Composer::initSourcesAPI()
 	}
 }
 
-void Composer::initSignals()
+int Composer::initSignals()
 {
 	for(int i=0; i < sourcesListV_.size(); i++)
 	{
 		std::shared_ptr<SourceAPI> src = sourcesListV_[i];
 		src->initSignals();
 	}
-	execSignalsSubscription();
+	return execSignalsSubscription();
 }
 
 std::shared_ptr<SourceAPI> Composer::getSourceAPI(const std::string& api)
@@ -579,13 +579,16 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 	return finalResponse;
 }
 
-void Composer::execSignalsSubscription()
+int Composer::execSignalsSubscription()
 {
+	int err = 0;;
 	for(std::shared_ptr<SourceAPI> srcAPI: sourcesListV_)
 	{
 		if (srcAPI->api() != std::string(ctlConfig_->api))
 		{
-			srcAPI->makeSubscription();
+			err += srcAPI->makeSubscription();
 		}
 	}
+
+	return err;
 }

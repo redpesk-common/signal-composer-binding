@@ -53,5 +53,6 @@ public:
 	std::vector<std::shared_ptr<Signal>> getSignals() const;
 	std::vector<std::shared_ptr<Signal>> searchSignals(const std::string& name);
 
-	void makeSubscription();
+	int cleanNotSubscribedSignals();
+	int makeSubscription();
 };

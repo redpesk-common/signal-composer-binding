@@ -83,15 +83,22 @@ static int one_subscribe_unsubscribe(struct afb_req request,
 	int err = 0;
 	std::vector<std::shared_ptr<Signal>> signals = Composer::instance().searchSignals(event);
 
-	if(subscribe)
+	if(signals.size() == 0 && subscribe)
 	{
-		cContext->appendSignals(signals);
-		err = cContext->makeSubscription(request);
+		err--;
 	}
 	else
 	{
-		cContext->subtractSignals(signals);
-		err = cContext->makeUnsubscription(request);
+		if(subscribe)
+		{
+			cContext->appendSignals(signals);
+			err = cContext->makeSubscription(request);
+		}
+		else
+		{
+			cContext->subtractSignals(signals);
+			err = cContext->makeUnsubscription(request);
+		}
 	}
 
 	return err;

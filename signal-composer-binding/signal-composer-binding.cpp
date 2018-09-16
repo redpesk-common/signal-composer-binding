@@ -178,9 +178,16 @@ void addObjects(afb_req request)
 	if(filepath)
 	{
 		objectsJ = json_object_from_file(filepath);
-		if(!objectsJ)
+		if(! objectsJ)
 		{
-			json_object* responseJ = ScanForConfig(CONTROL_CONFIG_PATH, CTL_SCAN_RECURSIVE, filepath, ".json");
+			const char *has_slash = strrchr(filepath, '/');
+			char *filename = has_slash ? strdupa(has_slash + 1) : strdupa(filepath);
+			char *filename_end = strrchr(filename, '.');
+			if (filename_end)
+				{*filename_end = '\0';}
+
+			json_object* responseJ = ScanForConfig(CONTROL_CONFIG_PATH, CTL_SCAN_RECURSIVE, filename, ".json");
+
 			if(responseJ)
 			{
 				filepath = ConfigSearch(nullptr, responseJ);

@@ -29,13 +29,6 @@ This will install the binding into _${HOME}/opt/signal-composer_ directory. You 
 
 ### Prerequisites
 
-You can use gitbook to serve documentation. To do so, please install it using *npm* as well as *calibre* package from your package distribution manager:
-
-```bash
-sudo npm install -g gitbook-cli
-sudo apt-get install calibre
-```
-
 To generate Doxygen documentation, you'll need doxygen and graphviz:
 
 ```bash
@@ -50,18 +43,6 @@ cmake ..
 ```
 
 ### Generation
-
-Generate a PDF version :
-
-```bash
-gendocs.sh pdf
-```
-
-Serve an HTML version, this will run a web server that will serve you locally documentation :
-
-```bash
-gendocs.sh serve
-```
 
 Generate **doxygen** documentation:
 

@@ -107,7 +107,7 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 	const char *uid, *api, *info;
 	int retention = 0;
 
-	int err = wrap_json_unpack(sourceJ, "{ss,s?s,s?o,s?o,s?o,s?i,s?o !}",
+	int err = wrap_json_unpack(sourceJ, "{ss,ss,s?o,s?o,s?o,s?o,s?i !}",
 			"uid", &uid,
 			"api", &api,
 			"info", &info,
@@ -118,7 +118,7 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 			"retention", &retention);
 	if (err)
 	{
-		AFB_ERROR("Missing something api|[info]|[init]|[getSignals] in %s", json_object_get_string(sourceJ));
+		AFB_ERROR("Missing or incorrect field uid|api|[info]|[init]|[getSignals]|[onReceived]|[retention] in %s", json_object_get_string(sourceJ));
 		return err;
 	}
 
@@ -167,14 +167,18 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 	{
 		std::size_t count = 1;
 		json_object *sigCompJ = nullptr;
-		// add the signal composer itself as source
-		wrap_json_pack(&sigCompJ, "{ss,ss,ss}",
-		"uid", "Signal-Composer-service",
-		"api", afbBindingV2.api,
-		"info", "Api on behalf the virtual signals are sent");
 
-		if(json_object_is_type(sourcesJ, json_type_array))
-			json_object_array_add(sourcesJ, sigCompJ);
+		// add the signal composer itself as source if not already done
+		if(! composer.getSourceAPI("Signal-Composer-service"))
+		{
+			wrap_json_pack(&sigCompJ, "{ss,ss,ss}",
+			"uid", "Signal-Composer-service",
+			"api", afbBindingV2.api,
+			"info", "Api on behalf the virtual signals are sent");
+
+			if(json_object_is_type(sourcesJ, json_type_array))
+				json_object_array_add(sourcesJ, sigCompJ);
+		}
 
 		if (json_object_get_type(sourcesJ) == json_type_array)
 		{
@@ -189,8 +193,13 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 		}
 		else
 		{
-			if ((err = composer.loadOneSourceAPI(sourcesJ))) return err;
-			if (sigCompJ && (err = composer.loadOneSourceAPI(sigCompJ))) return err;
+			if (err = composer.loadOneSourceAPI(sourcesJ))
+				return err;
+			if (sigCompJ)
+			{
+				if (err = composer.loadOneSourceAPI(sigCompJ))
+					return err;
+			}
 		}
 		AFB_NOTICE("%ld new sources added to service", count);
 	}
@@ -283,10 +292,8 @@ int Composer::loadOneSignal(json_object* signalJ)
 			dependsV.push_back(sourceStr);
 		}
 		if(!src) {
-			if (!sourcesListV_.empty())
-				src = *sourcesListV_.rbegin();
-			else if (!newSourcesListV_.empty())
-				src = *newSourcesListV_.rbegin();
+			if ( ! sourcesListV_.empty() || ! newSourcesListV_.empty())
+				src = getSourceAPI("signal-composer");
 			else
 			{
 				AFB_WARNING("Signal '%s' not correctly attached to its source. Abort this one", json_object_to_json_string(signalJ));

@@ -107,6 +107,68 @@ _AFT.testVerbStatusError(testPrefix.."getFilterInvalidSecondArgument","signal-co
 
 --[[
 ################################################################################
+########################### Adding new sources #################################
+################################################################################
+]]
+
+---------------------------
+-- Successful verb calls --
+---------------------------
+
+--[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing the path of a json containing sources
+	 then making a get, a subscribe, and an unsubscribe looking for any misbehaviour from sources added with the verb ]]
+_AFT.describe(testPrefix.."addSourcesByFile", function()
+	_AFT.assertVerbStatusSuccess("signal-composer", "addObjects", {file = _AFT.bindingRootDir.."/var/source.json"})
+end);
+
+-- This tests the 'addObjects' verb of the signal-composer API, this is by passing directly the json object as a lua table
+_AFT.testVerbStatusSuccess(testPrefix.."addSourcesDirect","signal-composer","addObjects",
+	{
+		sources = {
+			uid = "DummySource2",
+			api = "dummy2",
+			info = "Another dummy source to be used as test source",
+		}
+	}
+);
+
+-----------------------
+-- Failed verb calls --
+-----------------------
+
+--[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing directly the json object as a lua table.
+	This one has invalid doesn't specified the required api field which should fails the assertion]]
+_AFT.testVerbStatusError(testPrefix.."addSourcesDirect_InvalidSource","signal-composer","addObjects",
+	{
+		sources = {
+			{
+				uid = "invalidSource",
+				info = "An invalid source without Api specified",
+			}
+		}
+	}
+);
+
+--[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing directly the json object as a lua table.
+	This one has a wrong retention field ]]
+_AFT.testVerbStatusError(testPrefix.."addSourcesDirect_MissingField","signal-composer","addObjects",
+	{
+		sources= {
+			{
+				api = "invalidSource3",
+				info = "An invalid source without UID specified",
+				retention = "Invalid retention"
+			}
+		}
+	}
+);
+
+--[[ This tests the 'addObjects' verb of the signal-composer API, this is by passing the path of a json containing sources
+	This one has invalid values for most of its field, the binding should not be able to add it ]]
+_AFT.testVerbStatusError(testPrefix.."addSourcesByFile_InvalidSources","signal-composer","addObjects",{file = _AFT.bindingRootDir.."/var/sources_invalid.json"});
+
+--[[
+################################################################################
 ########################### Adding new signals #################################
 ################################################################################
 ]]

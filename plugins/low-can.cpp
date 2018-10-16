@@ -72,7 +72,7 @@ CTLP_ONLOAD(plugin, composerHandle)
 }
 
 CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
-	json_object* dependsArrayJ = nullptr, *subscribeArgsJ = nullptr, *subscribeFilterJ = nullptr, *responseJ = nullptr, *filterJ = nullptr;
+	json_object* metadataJ = nullptr, *dependsArrayJ = nullptr, *subscribeArgsJ = nullptr, *subscribeFilterJ = nullptr, *responseJ = nullptr, *filterJ = nullptr;
 	const char *id = nullptr, *event = nullptr, *unit = nullptr;
 	double frequency = 0;
 	int err = 0;
@@ -82,11 +82,12 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
 
 	if(eventJ)
 	{
-		err = wrap_json_unpack(eventJ, "{ss,s?s,s?o,s?s,s?F,s?o !}",
+		err = wrap_json_unpack(eventJ, "{ss,s?s,s?o,s?s,s?o,s?F,s?o !}",
 			"uid", &id,
 			"event", &event,
 			"depends", &dependsArrayJ,
 			"unit", &unit,
+			"metadata", &metadataJ,
 			"frequency", &frequency,
 			"getSignalsArgs", &filterJ);
 		if(err)

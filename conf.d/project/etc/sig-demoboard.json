@@ -12,7 +12,7 @@
 				"min": 10
 			},
 			"onReceived": {
-				"function": "lua://_Unit_Converter",
+				"action": "lua://convert#_Unit_Converter",
 				"args": {
 					"from": "km/h",
 					"to": "mi/h"

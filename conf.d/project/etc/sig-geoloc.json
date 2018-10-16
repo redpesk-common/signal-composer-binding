@@ -7,8 +7,7 @@
 			"unit": "degree",
 			"frequency": 1,
 			"onReceived": {
-				"uri": "plugin://gps-callbacks",
-				"function": "getLatitude"
+				"action": "plugin://gps-callbacks#getLatitude"
 			}
 		},
 		{
@@ -17,11 +16,7 @@
 			"unit": "degree",
 			"frequency": 1,
 			"onReceived": {
-				"uri": "plugin://gps-callbacks",
-				"function": "getSignal",
-				"args": {
-					"what": "longitude"
-				}
+				"action": "plugin://gps-callbacks#getLongitude"
 			}
 		},
 		{
@@ -40,8 +35,7 @@
 			"unit": "degree",
 			"frequency": 1,
 			"onReceived": {
-				"uri": "plugin://gps-callbacks",
-				"function": "getHeading"
+				"action": "plugin://gps-callbacks#getHeading"
 			}
 		},
 		{

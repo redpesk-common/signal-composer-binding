@@ -5,15 +5,14 @@
 			"uid": "rear_left_window",
 			"event": "low-can/messages.windows.rear_left.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen"
+				"action": "plugin://low-can-callbacks#isOpen"
 			}
 		},
 		{
 			"uid": "rear_left_door",
 			"event": "low-can/messages.doors.rear_left.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"function": "isOpen"
 			}
 		},
@@ -21,7 +20,7 @@
 			"uid": "rear_right_window",
 			"event": "low-can/messages.windows.rear_right.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"function": "isOpen"
 			}
 		},
@@ -29,7 +28,7 @@
 			"uid": "rear_right_door",
 			"event": "low-can/messages.doors.rear_right.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"function": "isOpen"
 			}
 		},
@@ -37,7 +36,7 @@
 			"uid": "front_left_window",
 			"event": "low-can/messages.windows.front_left.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"function": "isOpen"
 			}
 		},
@@ -45,24 +44,21 @@
 			"uid": "front_left_door",
 			"event": "low-can/messages.doors.front_left.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen"
+				"action": "plugin://low-can-callbacks#isOpen"
 			}
 		},
 		{
 			"uid": "front_right_window",
 			"event": "low-can/messages.windows.front_right.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen"
+				"action": "plugin://low-can-callbacks#isOpen"
 			}
 		},
 		{
 			"uid": "front_right_door",
 			"event": "low-can/messages.doors.front_right.open",
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen"
+				"action": "plugin://low-can-callbacks#isOpen"
 			}
 		},
 		{
@@ -72,8 +68,7 @@
 				"rear_left_door"
 			],
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen"
+				"action": "plugin://low-can-callbacks#isOpen"
 			}
 		},
 		{
@@ -83,8 +78,7 @@
 				"rear_right_window"
 			],
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"args": {}
 			}
 		},
@@ -95,8 +89,7 @@
 				"front_left_window"
 			],
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"args": {}
 			}
 		},
@@ -107,8 +100,7 @@
 				"front_right_window"
 			],
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"args": {}
 			}
 		},
@@ -125,8 +117,7 @@
 				"rear_right_window"
 			],
 			"onReceived": {
-				"uri": "plugin://low-can-callbacks",
- 				"function": "isOpen",
+				"action": "plugin://low-can-callbacks#isOpen",
 				"args": {
 					"evtname": "doors.open"
 				}

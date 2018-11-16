@@ -34,25 +34,25 @@ private:
 	Composer();
 	~Composer();
 
-	CtlActionT* convert2Action(const std::string& name, json_object* action);
+	CtlActionT* convert2Action(AFB_ApiT apihandle, const std::string& name, json_object* action);
 
-	int loadOneSourceAPI(json_object* sourcesJ);
+	int loadOneSourceAPI(AFB_ApiT apihandle, json_object* sourcesJ);
 	static int loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_object *signalsJ);
 
-	int loadOneSignal(json_object* signalsJ);
+	int loadOneSignal(AFB_ApiT apihandle, json_object* signalsJ);
 	static int loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object *signalsJ);
 
-	int execSignalsSubscription();
+	int execSignalsSubscription(AFB_ReqT request = nullptr);
 	std::shared_ptr<SourceAPI> getSourceAPI(const std::string& api);
 	void processOptions(const std::map<std::string, int>& opts, std::shared_ptr<Signal> sig, json_object* response) const;
 public:
 	static Composer& instance();
 	static void* createContext(void* ctx);
 	static void destroyContext(void* ctx);
-	int loadConfig(std::string& filepath);
+	int loadConfig(AFB_ApiT api, std::string& filepath);
 	int loadSources(json_object* sourcesJ);
 	int loadSignals(json_object* signalsJ);
-	int initSignals();
+	int initSignals(AFB_ReqT request = nullptr);
 	void initSourcesAPI();
 
 	CtlConfigT* ctlConfig();

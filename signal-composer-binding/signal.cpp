@@ -229,12 +229,13 @@ void Signal::set(uint64_t timestamp, json_object*& value)
 void Signal::update(Signal* sig)
 {
 	json_object *depSigJ = json_object_new_array();
-	CtlSourceT src = {
-		.uid = sig->id().c_str(),
-		.api = nullptr,
-		.request = {nullptr, nullptr},
-		.context = (void*)get_context(),
-		.status = CTL_STATUS_EVT};
+	CtlSourceT source;
+	::memset(&source, 0, sizeof(CtlSourceT));
+	source.uid = sig->id().c_str();
+	source.api = afbBindingV3root;
+	source.context = (void*)get_context();
+	source.status = CTL_STATUS_EVT ;
+
 	Composer& composer = Composer::instance();
 
 	for(const std::string& depSignal : dependsSigV_)
@@ -247,7 +248,7 @@ void Signal::update(Signal* sig)
 	}
 	json_object_array_add(depSigJ, sig->toJSON());
 
-	ActionExecOne(&src, onReceived_, depSigJ);
+	ActionExecOne(&source, onReceived_, depSigJ);
 }
 
 /// @brief
@@ -323,9 +324,8 @@ void Signal::onReceivedCB(json_object *eventJ)
 	}
 
 	CtlSourceT source;
+	::memset(&source, 0, sizeof(CtlSourceT));
 	source.uid = id_.c_str();
-	source.api  = nullptr; // We use binding v2, no dynamic API.
-	source.request = {nullptr, nullptr};
 	source.context = (void*)get_context();
 	if (onReceived_)
 		ActionExecOne(&source, onReceived_, json_object_get(eventJ));

@@ -84,19 +84,19 @@ Composer::~Composer()
 	free(ctlConfig_);
 }
 
-CtlActionT* Composer::convert2Action(const std::string& name, json_object* actionJ)
+CtlActionT* Composer::convert2Action(AFB_ApiT apihandle, const std::string& name, json_object* actionJ)
 {
 	CtlActionT *ctlAction = new CtlActionT;
 
 	json_object_object_add(actionJ, "uid", json_object_new_string(name.c_str()));
 
-	if(! ActionLoadOne(nullptr, ctlAction, actionJ, 0))
+	if(! ActionLoadOne(apihandle, ctlAction, actionJ, 0))
 		{return ctlAction;}
 	delete(ctlAction);
 	return nullptr;
 }
 
-int Composer::loadOneSourceAPI(json_object* sourceJ)
+int Composer::loadOneSourceAPI(AFB_ApiT apihandle, json_object* sourceJ)
 {
 	json_object *initJ = nullptr,
 				*getSignalsJ = nullptr,
@@ -135,11 +135,11 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 	if(ctlConfig_ && ctlConfig_->requireJ)
 	{
 		const char* requireS = json_object_to_json_string(ctlConfig_->requireJ);
-		if(!strcasestr(requireS, api) && !strcasestr(api, afbBindingV2.api))
+		if(!strcasestr(requireS, api) && !strcasestr(api, afbBindingV3root->apiname))
 			{AFB_WARNING("Caution! You don't specify the API source as required in the metadata section. This API '%s' may not be initialized", api);}
 	}
 
-	initCtl = initJ ? convert2Action("init", initJ) : nullptr;
+	initCtl = initJ ? convert2Action(apihandle, "init", initJ) : nullptr;
 
 	// Define default action to take to subscibe souce's signals if none
 	// defined.
@@ -150,9 +150,9 @@ int Composer::loadOneSourceAPI(json_object* sourceJ)
 		std::string uri = "api://" + std::string(api) + "#subscribe";
 		json_object_object_add(getSignalsJ, "action", json_object_new_string(uri.c_str()));
 	}
-	getSignalsCtl = convert2Action("getSignals", getSignalsJ);
+	getSignalsCtl = convert2Action(apihandle, "getSignals", getSignalsJ);
 
-	onReceivedCtl = onReceivedJ ? convert2Action("onReceived", onReceivedJ) : nullptr;
+	onReceivedCtl = onReceivedJ ? convert2Action(apihandle, "onReceived", onReceivedJ) : nullptr;
 
 	newSourcesListV_.push_back(std::make_shared<SourceAPI>(uid, api, info, initCtl, getSignalsCtl, onReceivedCtl, retention));
 	return err;
@@ -173,7 +173,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 		{
 			wrap_json_pack(&sigCompJ, "{ss,ss,ss}",
 			"uid", "Signal-Composer-service",
-			"api", afbBindingV2.api,
+			"api", afbBindingV3root->apiname,
 			"info", "Api on behalf the virtual signals are sent");
 
 			if(json_object_is_type(sourcesJ, json_type_array))
@@ -187,17 +187,17 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 			for (int idx = 0; idx < count; idx++)
 			{
 				json_object *sourceJ = json_object_array_get_idx(sourcesJ, idx);
-				err = composer.loadOneSourceAPI(sourceJ);
+				err = composer.loadOneSourceAPI(apihandle, sourceJ);
 				if (err) return err;
 			}
 		}
 		else
 		{
-			if (err = composer.loadOneSourceAPI(sourcesJ))
+			if ( (err = composer.loadOneSourceAPI(apihandle, sourcesJ)) )
 				return err;
 			if (sigCompJ)
 			{
-				if (err = composer.loadOneSourceAPI(sigCompJ))
+				if ( (err = composer.loadOneSourceAPI(apihandle, sigCompJ)) )
 					return err;
 			}
 		}
@@ -209,7 +209,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 	return err;
 }
 
-int Composer::loadOneSignal(json_object* signalJ)
+int Composer::loadOneSignal(AFB_ApiT apihandle, json_object* signalJ)
 {
 	json_object *onReceivedJ = nullptr,
 		    *dependsJ = nullptr,
@@ -324,7 +324,7 @@ int Composer::loadOneSignal(json_object* signalJ)
 			if(onReceivedCtl)
 				{onReceivedCtl->uid = uid;}
 	}
-	else {onReceivedCtl = convert2Action(uid, onReceivedJ);}
+	else {onReceivedCtl = convert2Action(apihandle, uid, onReceivedJ);}
 
 	if(src != nullptr)
 		{src->addSignal(id, event, dependsV, retention, unit, metadataJ, frequency, onReceivedCtl, getSignalsArgs);}
@@ -348,11 +348,11 @@ int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object 
 			for (int idx = 0; idx < count; idx++)
 			{
 				json_object *signalJ = json_object_array_get_idx(signalsJ, idx);
-				err += composer.loadOneSignal(signalJ);
+				err += composer.loadOneSignal(apihandle, signalJ);
 			}
 		}
 		else
-			{err = composer.loadOneSignal(signalsJ);}
+			{err = composer.loadOneSignal(apihandle, signalsJ);}
 		AFB_NOTICE("%ld new signals added to service", count);
 	}
 	else
@@ -421,35 +421,30 @@ void Composer::destroyContext(void* ctx)
 	delete(reinterpret_cast<clientAppCtx*>(ctx));
 }
 
-int Composer::loadConfig(std::string& filepath)
+int Composer::loadConfig(AFB_ApiT api, std::string& filepath)
 {
 	const char *dirList= getenv("CONTROL_CONFIG_PATH");
 	if (!dirList) dirList=CONTROL_CONFIG_PATH;
 	filepath.append(":");
 	filepath.append(dirList);
-	const char *configPath = CtlConfigSearch(nullptr, filepath.c_str(), "control");
+	const char *configPath = CtlConfigSearch(api, filepath.c_str(), "control");
 
 	if (!configPath) {
-		AFB_ApiError(apiHandle, "CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
+		AFB_ERROR_V3("CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
 		return -1;
 	}
 
 	// create one API per file
-	ctlConfig_ = CtlLoadMetaData(nullptr, configPath);
+	ctlConfig_ = CtlLoadMetaData(api, configPath);
 	if (!ctlConfig_) {
-		AFB_ApiError(apiHandle, "CtrlPreInit No valid control config file in:\n-- %s", configPath);
+		AFB_ERROR_V3("CtrlPreInit No valid control config file in:\n-- %s", configPath);
 		return -1;
 	}
 
-	if (ctlConfig_->api) {
-		int err = afb_daemon_rename_api(ctlConfig_->api);
-		if (err) {
-			AFB_ApiError(apiHandle, "Fail to rename api to:%s", ctlConfig_->api);
-			return -1;
-		}
-	}
+	// Save the config in the api userdata field
+	afb_api_set_userdata(api, ctlConfig_);
 
-	int err= CtlLoadSections(nullptr, ctlConfig_, ctlSections_);
+	int err= CtlLoadSections(api, ctlConfig_, ctlSections_);
 	return err;
 }
 
@@ -487,14 +482,14 @@ void Composer::initSourcesAPI()
 	}
 }
 
-int Composer::initSignals()
+int Composer::initSignals(AFB_ReqT request)
 {
 	for(int i=0; i < sourcesListV_.size(); i++)
 	{
 		std::shared_ptr<SourceAPI> src = sourcesListV_[i];
 		src->initSignals();
 	}
-	return execSignalsSubscription();
+	return execSignalsSubscription(request);
 }
 
 std::shared_ptr<SourceAPI> Composer::getSourceAPI(const std::string& api)
@@ -586,14 +581,14 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 	return finalResponse;
 }
 
-int Composer::execSignalsSubscription()
+int Composer::execSignalsSubscription(AFB_ReqT request)
 {
 	int err = 0;;
 	for(std::shared_ptr<SourceAPI> srcAPI: sourcesListV_)
 	{
 		if (srcAPI->api() != std::string(ctlConfig_->api))
 		{
-			err += srcAPI->makeSubscription();
+			err += srcAPI->makeSubscription(request);
 		}
 	}
 

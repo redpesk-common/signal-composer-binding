@@ -54,5 +54,5 @@ public:
 	std::vector<std::shared_ptr<Signal>> searchSignals(const std::string& name);
 
 	int cleanNotSubscribedSignals();
-	int makeSubscription();
+	int makeSubscription(AFB_ReqT request = nullptr);
 };

@@ -48,12 +48,10 @@ void SourceAPI::init()
 	{
 		CtlSourceT source;
 		source.uid = init_->uid;
-		source.api  = nullptr; // We use binding v2, no dynamic API.
-		source.request = {nullptr, nullptr};
 		ActionExecOne(&source, init_, json_object_new_object());
 		return;
 	}
-	else if(api_ == afbBindingV2.api)
+	else if(api_ == afbBindingV3root->apiname)
 		{api_ = Composer::instance().ctlConfig()->api;}
 }
 
@@ -157,15 +155,14 @@ int SourceAPI::cleanNotSubscribedSignals() {
 	return erased;
 }
 
-int SourceAPI::makeSubscription()
+int SourceAPI::makeSubscription(AFB_ReqT request)
 {
 	int err = 0;
 	if(getSignals_)
 	{
 		CtlSourceT source;
 		source.uid = api_.c_str();
-		source.api = nullptr; // We use binding v2, no dynamic API.
-		source.request = {nullptr, nullptr};
+		source.request = request;
 		json_object *argsSaveJ = getSignals_->argsJ;
 
 		for(auto& sig: signalsM_)

@@ -62,7 +62,7 @@ CTLP_CAPI (getHeading, source, argsJ, eventJ) {
 		ctx->setSignalValue(ctx->aSignal, 0, json_object_new_double(heading));
 	}
 
-	AFB_NOTICE("======== Heading: %f", heading);
+	AFB_API_NOTICE(source->api, "======== Heading: %f", heading);
 	return err;
 }
 // extern "C" closure

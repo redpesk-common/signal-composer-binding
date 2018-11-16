@@ -20,8 +20,8 @@
 // afb-utilities
 #include <wrap-json.h>
 #include <filescan-utils.h>
+#include <afb/afb-binding>
 
-#include "signal-composer-binding.hpp"
 #include "signal-composer-apidef.h"
 #include "clientApp.hpp"
 
@@ -74,7 +74,7 @@ void onEvent(const char *event, json_object *object)
 	}
 }
 
-static int one_subscribe_unsubscribe(struct afb_req request,
+static int one_subscribe_unsubscribe(AFB_ReqT request,
 	bool subscribe,
 	const std::string& event,
 	json_object* args,
@@ -104,7 +104,7 @@ static int one_subscribe_unsubscribe(struct afb_req request,
 	return err;
 }
 
-static int subscribe_unsubscribe(struct afb_req request,
+static int subscribe_unsubscribe(AFB_ReqT request,
 	bool subscribe,
 	json_object* args,
 	clientAppCtx* cContext)
@@ -133,7 +133,7 @@ static int subscribe_unsubscribe(struct afb_req request,
 }
 
 /// @brief entry point for client subscription request.
-static void do_subscribe_unsubscribe(afb_req request, bool subscribe, clientAppCtx* cContext)
+static void do_subscribe_unsubscribe(AFB_ReqT request, bool subscribe, clientAppCtx* cContext)
 {
 	int rc = 0;
 	json_object *oneArg = nullptr, *args = afb_req_json(request);
@@ -157,24 +157,24 @@ static void do_subscribe_unsubscribe(afb_req request, bool subscribe, clientAppC
 }
 
 /// @brief entry point for client un-subscription request.
-void subscribe(afb_req request)
+void subscribe(AFB_ReqT request)
 {
-	clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context_make(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
+	clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
 
 	do_subscribe_unsubscribe(request, true, cContext);
 }
 
 /// @brief entry point for client un-subscription request.
-void unsubscribe(afb_req request)
+void unsubscribe(AFB_ReqT request)
 {
-	clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context_make(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
+	clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
 
 	do_subscribe_unsubscribe(request, false, cContext);
 }
 
 /// @brief verb that loads JSON configuration (old SigComp.json file now)
 
-void addObjects(afb_req request)
+void addObjects(AFB_ReqT request)
 {
 	Composer& composer = Composer::instance();
 	json_object *sourcesJ = nullptr,
@@ -244,7 +244,7 @@ void addObjects(afb_req request)
 }
 
 /// @brief entry point to list available signals
-void list(afb_req request)
+void list(AFB_ReqT request)
 {
 	struct json_object *allSignalsJ = json_object_new_array();
 
@@ -259,7 +259,7 @@ void list(afb_req request)
 }
 
 /// @brief entry point for get requests.
-void get(struct afb_req request)
+void get(AFB_ReqT request)
 {
 	int err = 0, i = 0;
 	size_t l = 0;
@@ -295,22 +295,22 @@ void get(struct afb_req request)
 
 }
 
-int loadConf()
+int loadConf(AFB_ApiT api)
 {
 	int err = 0;
 	std::string bindingDirPath = GetBindingDirPath();
 	std::string rootdir = bindingDirPath + "/etc";
 
-	err = Composer::instance().loadConfig(rootdir);
+	err = Composer::instance().loadConfig(api, rootdir);
 
 	return err;
 }
 
-int execConf()
+int execConf(AFB_ApiT api)
 {
 	Composer& composer = Composer::instance();
 	int err = 0;
-	CtlConfigExec(nullptr, composer.ctlConfig());
+	CtlConfigExec(api, composer.ctlConfig());
 
 	AFB_DEBUG("Signal Composer Control configuration Done.");
 

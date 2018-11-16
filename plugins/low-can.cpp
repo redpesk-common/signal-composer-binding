@@ -121,7 +121,7 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
 	{
 		json_object_get(pluginCtx->subscriptionBatch);
 		AFB_DEBUG("Calling subscribe with %s", json_object_to_json_string(pluginCtx->subscriptionBatch));
-		err = afb_service_call_sync("low-can", "subscribe", pluginCtx->subscriptionBatch, &responseJ);
+		err = afb_api_call_sync_legacy(source->api, "low-can", "subscribe", pluginCtx->subscriptionBatch, &responseJ);
 		if(err)
 			{AFB_ERROR("Subscribe to '%s' responseJ:%s", json_object_to_json_string(pluginCtx->subscriptionBatch), json_object_to_json_string(responseJ));}
 

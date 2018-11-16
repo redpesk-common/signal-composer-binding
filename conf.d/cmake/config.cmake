@@ -130,7 +130,7 @@ set(CONTROL_SUPPORT_LUA 1)
 add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/lib/plugins:${CMAKE_BINARY_DIR}/package/lib/plugins:${CMAKE_BINARY_DIR}/package/var:${CMAKE_BINARY_DIR}/package-test")
 add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/etc:${CMAKE_BINARY_DIR}/package/etc:${CMAKE_BINARY_DIR}/package-test/")
 add_definitions(-DCTL_PLUGIN_MAGIC=1286576532)
-add_definitions(-DAFB_BINDING_VERSION=2)
+add_definitions(-DAFB_BINDING_VERSION=3)
 
 # Optional location for config.xml.in
 # -----------------------------------

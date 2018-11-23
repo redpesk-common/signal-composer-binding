@@ -49,15 +49,90 @@ void SourceAPI::init()
 		CtlSourceT source;
 		source.uid = init_->uid;
 		ActionExecOne(&source, init_, json_object_new_object());
+		std::string sourceAPI_events = api_ + "/*";
+		afb_api_event_handler_add(afbBindingV3root, sourceAPI_events.c_str(), SourceAPI::onSourceEvents, NULL);
 		return;
 	}
-	else if(api_ == afbBindingV3root->apiname)
+
+	if(api_ == afbBindingV3root->apiname)
 		{api_ = Composer::instance().ctlConfig()->api;}
 }
 
 std::string SourceAPI::api() const
 {
 	return api_;
+}
+
+/// @brief callback for receiving message from low bindings. This will call back
+/// an action defined in the configuration files depending on the events
+/// received from an API.
+///
+/// @param[in] object - an opaq pointer holding userdata
+/// @param[in] event  - event name
+/// @param[in] object - eventual data that comes with the event
+/// @param[in] object - the api that subscribed the event
+///
+void SourceAPI::onSourceEvents(void *closure, const char *event_name, json_object *event_obj, AFB_ApiT api)
+{
+	std::vector<std::shared_ptr<Signal>> signals { Composer::instance().searchSignals(event_name) };
+
+	if(signals.empty())
+	{
+		AFB_NOTICE("This event '%s' isn't registered within the signal composer configuration. Continue.", event_name);
+		return;
+	}
+	// If there is more than 1 element then maybe we can find a more
+	// detailled event name in JSON object as 1 event may carry several
+	// signals. Try to find that one.
+	if(signals.size() > 1)
+	{
+		bool found = false;
+		json_object_iterator iter = json_object_iter_begin(event_obj);
+		json_object_iterator iterEnd = json_object_iter_end(event_obj);
+		while(!json_object_iter_equal(&iter, &iterEnd))
+		{
+			json_object *value = json_object_iter_peek_value(&iter);
+			if(json_object_is_type(value, json_type_string))
+			{
+				std::string name = json_object_get_string(value);
+				for(auto& sig: signals)
+				{
+					if(*sig == name)
+					{
+						found = true;
+						sig->onReceivedCB(event_obj);
+					}
+				}
+			}
+			json_object_iter_next(&iter);
+		}
+		// If nothing found in JSON data then apply onReceived callback
+		// for all signals found
+		if(! found)
+		{
+			for(auto& sig: signals)
+				{sig->onReceivedCB(event_obj);}
+		}
+	}
+	else
+	{
+		signals[0]->onReceivedCB(event_obj);
+	}
+}
+
+/// @brief callback for receiving message from low bindings. This will call back
+/// an action defined in the configuration files depending on the events
+/// received from an API.
+///
+/// @param[in] object - an opaq pointer holding userdata
+/// @param[in] event  - event name
+/// @param[in] object - eventual data that comes with the event
+/// @param[in] object - the api that subscribed the event
+///
+void SourceAPI::onSignalEvents(void *closure, const char *event_name, json_object *event_obj, AFB_ApiT api)
+{
+	Signal *sig = (Signal*) closure;
+	sig->onReceivedCB(event_obj);
 }
 
 const struct signalsDefault& SourceAPI::signalsDefault() const
@@ -69,13 +144,17 @@ void SourceAPI::addSignal(const std::string& id, const std::string& event, std::
 {
 	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, metadata, retention, frequency, onReceived, getSignalsArgs);
 
+	if(onReceived && ! event.empty())
+		afb_api_event_handler_add(afbBindingV3root, event.c_str(), SourceAPI::onSignalEvents, (void*)sig.get());
+
 	newSignalsM_[id] = sig;
 }
 
 void SourceAPI::initSignals()
 {
-	Composer& composer = Composer::instance();
 	int err = 0;
+	Composer& composer = Composer::instance();
+
 	for(auto& i: newSignalsM_)
 		{i.second->attachToSourceSignals(composer);}
 

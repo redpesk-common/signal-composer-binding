@@ -25,55 +25,6 @@
 #include "signal-composer-apidef.h"
 #include "clientApp.hpp"
 
-/// @brief callback for receiving message from low bindings. This will callback
-/// an action defined in the configuration files depending on the event received
-///
-/// @param[in] event - event name
-/// @param[in] object - eventual data that comes with the event
-void onEvent(const char *event, json_object *object)
-{
-	std::vector<std::shared_ptr<Signal>> signals { Composer::instance().searchSignals(event) };
-
-	if(!signals.empty())
-	{
-		// If there is more than 1 element then maybe we can find a more
-		// detailled event name in JSON object as 1 event may carry several
-		// signals. Try to find that one.
-		if(signals.size() > 1)
-		{
-			bool found = false;
-			json_object_iterator iter = json_object_iter_begin(object);
-			json_object_iterator iterEnd = json_object_iter_end(object);
-			while(!json_object_iter_equal(&iter, &iterEnd))
-			{
-				json_object *value = json_object_iter_peek_value(&iter);
-				if(json_object_is_type(value, json_type_string))
-				{
-					std::string name = json_object_get_string(value);
-					for(auto& sig: signals)
-					{
-						if(*sig == name)
-						{
-							found = true;
-							sig->onReceivedCB(object);
-						}
-					}
-				}
-				json_object_iter_next(&iter);
-			}
-			// If nothing found in JSON data then apply onReceived callback
-			// for all signals found
-			if(! found)
-			{
-				for(auto& sig: signals)
-					{sig->onReceivedCB(object);}
-			}
-		}
-		else
-			{signals[0]->onReceivedCB(object);}
-	}
-}
-
 static int one_subscribe_unsubscribe(AFB_ReqT request,
 	bool subscribe,
 	const std::string& event,

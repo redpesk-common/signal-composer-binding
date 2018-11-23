@@ -11,7 +11,7 @@
 			"prefix": "",
 			"postfix": "",
 			"start": null ,
-			"onevent": "onEvent",
+			"onevent": null,
 			"preinit": "loadConf",
 			"init": "execConf",
 			"scope": "",

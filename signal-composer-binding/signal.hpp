@@ -66,7 +66,6 @@ private:
 
 public:
 	bool subscribed_; ///< subscribed_ - boolean value telling if yes or no the signal has been subcribed to the low level binding.
-	Signal();
 	Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, json_object *metadata, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs);
 	~Signal();
 

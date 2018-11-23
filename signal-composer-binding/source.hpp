@@ -46,6 +46,9 @@ public:
 
 	void init();
 	std::string api() const;
+
+	static void onSourceEvents(void *closure, const char *event_name, json_object *event_obj, AFB_ApiT api);
+	static void onSignalEvents(void *closure, const char *event_name, json_object *event_obj, AFB_ApiT api);
 	const struct signalsDefault& signalsDefault() const;
 	void addSignal(const std::string& id, const std::string& event, std::vector<std::string>& sources, int retention, const std::string& unit, json_object *metadata, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs);
 

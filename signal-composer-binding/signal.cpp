@@ -25,22 +25,6 @@
 
 #define USEC_TIMESTAMP_FLAG 1506514324881224
 
-Signal::Signal()
-:id_(""),
- event_(""),
- dependsSigV_(),
- timestamp_(0.0),
- value_(),
- retention_(0),
- frequency_(0),
- unit_(""),
- metadata_(nullptr),
- onReceived_(nullptr),
- getSignalsArgs_(nullptr),
- signalCtx_({nullptr, nullptr, nullptr, nullptr}),
- subscribed_(false)
-{}
-
 Signal::Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, json_object *metadata, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
 :id_(id),
  event_(event),

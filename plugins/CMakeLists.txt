@@ -29,13 +29,7 @@ PROJECT_TARGET_ADD(builtin)
 				OUTPUT_NAME ${TARGET_NAME}
 		)
 
-		# Library dependencies (include updates automatically)
-		TARGET_LINK_LIBRARIES(${TARGET_NAME}
-				${link_libraries}
-		)
-
 		target_include_directories(${TARGET_NAME}
-		PRIVATE "../ctl-utilities/ctl-lib"
 		PRIVATE "../signal-composer-binding")
 
 PROJECT_TARGET_ADD(low-can)
@@ -51,13 +45,7 @@ PROJECT_TARGET_ADD(low-can)
 		OUTPUT_NAME ${TARGET_NAME}
 	)
 
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		${link_libraries}
-	)
-
 	target_include_directories(${TARGET_NAME}
-		PRIVATE "../ctl-utilities/ctl-lib"
 		PRIVATE "../signal-composer-binding")
 
 PROJECT_TARGET_ADD(gps)
@@ -73,11 +61,5 @@ PROJECT_TARGET_ADD(gps)
 		OUTPUT_NAME ${TARGET_NAME}
 	)
 
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		${link_libraries}
-	)
-
 	target_include_directories(${TARGET_NAME}
-	PRIVATE "../ctl-utilities/ctl-lib"
 	PRIVATE "../signal-composer-binding")

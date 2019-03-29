@@ -29,8 +29,3 @@ PROJECT_TARGET_ADD(txc-binding)
 		LABELS "TEST-PLUGIN"
 		OUTPUT_NAME ${TARGET_NAME}
 	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		ctl-utilities
-		${link_libraries})

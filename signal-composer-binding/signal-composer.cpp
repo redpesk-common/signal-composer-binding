@@ -84,7 +84,7 @@ Composer::~Composer()
 	free(ctlConfig_);
 }
 
-CtlActionT* Composer::convert2Action(AFB_ApiT apihandle, const std::string& name, json_object* actionJ)
+CtlActionT* Composer::convert2Action(afb_api_t apihandle, const std::string& name, json_object* actionJ)
 {
 	CtlActionT *ctlAction = new CtlActionT;
 
@@ -96,7 +96,7 @@ CtlActionT* Composer::convert2Action(AFB_ApiT apihandle, const std::string& name
 	return nullptr;
 }
 
-int Composer::loadOneSourceAPI(AFB_ApiT apihandle, json_object* sourceJ)
+int Composer::loadOneSourceAPI(afb_api_t apihandle, json_object* sourceJ)
 {
 	json_object *initJ = nullptr,
 				*getSignalsJ = nullptr,
@@ -158,7 +158,7 @@ int Composer::loadOneSourceAPI(AFB_ApiT apihandle, json_object* sourceJ)
 	return err;
 }
 
-int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_object *sourcesJ)
+int Composer::loadSourcesAPI(afb_api_t apihandle, CtlSectionT* section, json_object *sourcesJ)
 {
 	int err = 0;
 	Composer& composer = instance();
@@ -209,7 +209,7 @@ int Composer::loadSourcesAPI(AFB_ApiT apihandle, CtlSectionT* section, json_obje
 	return err;
 }
 
-int Composer::loadOneSignal(AFB_ApiT apihandle, json_object* signalJ)
+int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 {
 	json_object *onReceivedJ = nullptr,
 		    *dependsJ = nullptr,
@@ -334,7 +334,7 @@ int Composer::loadOneSignal(AFB_ApiT apihandle, json_object* signalJ)
 	return err;
 }
 
-int Composer::loadSignals(AFB_ApiT apihandle, CtlSectionT* section, json_object *signalsJ)
+int Composer::loadSignals(afb_api_t apihandle, CtlSectionT* section, json_object *signalsJ)
 {
 	int err = 0;
 	Composer& composer = instance();
@@ -421,7 +421,7 @@ void Composer::destroyContext(void* ctx)
 	delete(reinterpret_cast<clientAppCtx*>(ctx));
 }
 
-int Composer::loadConfig(AFB_ApiT api, std::string& filepath)
+int Composer::loadConfig(afb_api_t api, std::string& filepath)
 {
 	const char *dirList= getenv("CONTROL_CONFIG_PATH");
 	if (!dirList) dirList=CONTROL_CONFIG_PATH;
@@ -482,7 +482,7 @@ void Composer::initSourcesAPI()
 	}
 }
 
-int Composer::initSignals(AFB_ReqT request)
+int Composer::initSignals(afb_req_t request)
 {
 	for(int i=0; i < sourcesListV_.size(); i++)
 	{
@@ -581,7 +581,7 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 	return finalResponse;
 }
 
-int Composer::execSignalsSubscription(AFB_ReqT request)
+int Composer::execSignalsSubscription(afb_req_t request)
 {
 	int err = 0;;
 	for(std::shared_ptr<SourceAPI> srcAPI: sourcesListV_)

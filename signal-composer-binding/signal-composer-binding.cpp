@@ -25,7 +25,7 @@
 #include "signal-composer-apidef.h"
 #include "clientApp.hpp"
 
-static int one_subscribe_unsubscribe(AFB_ReqT request,
+static int one_subscribe_unsubscribe(afb_req_t request,
 	bool subscribe,
 	const std::string& event,
 	json_object* args,
@@ -55,7 +55,7 @@ static int one_subscribe_unsubscribe(AFB_ReqT request,
 	return err;
 }
 
-static int subscribe_unsubscribe(AFB_ReqT request,
+static int subscribe_unsubscribe(afb_req_t request,
 	bool subscribe,
 	json_object* args,
 	clientAppCtx* cContext)
@@ -84,7 +84,7 @@ static int subscribe_unsubscribe(AFB_ReqT request,
 }
 
 /// @brief entry point for client subscription request.
-static void do_subscribe_unsubscribe(AFB_ReqT request, bool subscribe, clientAppCtx* cContext)
+static void do_subscribe_unsubscribe(afb_req_t request, bool subscribe, clientAppCtx* cContext)
 {
 	int rc = 0;
 	json_object *oneArg = nullptr, *args = afb_req_json(request);
@@ -108,7 +108,7 @@ static void do_subscribe_unsubscribe(AFB_ReqT request, bool subscribe, clientApp
 }
 
 /// @brief entry point for client un-subscription request.
-void subscribe(AFB_ReqT request)
+void subscribe(afb_req_t request)
 {
 	clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
 
@@ -116,7 +116,7 @@ void subscribe(AFB_ReqT request)
 }
 
 /// @brief entry point for client un-subscription request.
-void unsubscribe(AFB_ReqT request)
+void unsubscribe(afb_req_t request)
 {
 	clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
 
@@ -125,7 +125,7 @@ void unsubscribe(AFB_ReqT request)
 
 /// @brief verb that loads JSON configuration (old SigComp.json file now)
 
-void addObjects(AFB_ReqT request)
+void addObjects(afb_req_t request)
 {
 	Composer& composer = Composer::instance();
 	json_object *sourcesJ = nullptr,
@@ -195,7 +195,7 @@ void addObjects(AFB_ReqT request)
 }
 
 /// @brief entry point to list available signals
-void list(AFB_ReqT request)
+void list(afb_req_t request)
 {
 	struct json_object *allSignalsJ = json_object_new_array();
 
@@ -210,7 +210,7 @@ void list(AFB_ReqT request)
 }
 
 /// @brief entry point for get requests.
-void get(AFB_ReqT request)
+void get(afb_req_t request)
 {
 	int err = 0, i = 0;
 	size_t l = 0;
@@ -246,10 +246,10 @@ void get(AFB_ReqT request)
 
 }
 
-int loadConf(AFB_ApiT api)
+int loadConf(afb_api_t api)
 {
 	int err = 0;
-	std::string bindingDirPath = GetBindingDirPath();
+	std::string bindingDirPath = GetBindingDirPath(api);
 	std::string rootdir = bindingDirPath + "/etc";
 
 	err = Composer::instance().loadConfig(api, rootdir);
@@ -257,7 +257,7 @@ int loadConf(AFB_ApiT api)
 	return err;
 }
 
-int execConf(AFB_ApiT api)
+int execConf(afb_api_t api)
 {
 	Composer& composer = Composer::instance();
 	int err = 0;

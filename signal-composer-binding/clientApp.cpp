@@ -79,14 +79,14 @@ void clientAppCtx::subtractSignals(std::vector<std::shared_ptr<Signal>>& sigV)
 	}
 }
 
-int clientAppCtx::makeSubscription(AFB_ReqT request)
+int clientAppCtx::makeSubscription(afb_req_t request)
 {
 	event_ = afb_event_is_valid(event_) ?
 		event_ : afb_daemon_make_event(uuid_.c_str());
 	return afb_req_subscribe(request, event_);
 }
 
-int clientAppCtx::makeUnsubscription(AFB_ReqT request)
+int clientAppCtx::makeUnsubscription(afb_req_t request)
 {
 	if(subscribedSignals_.empty())
 	{

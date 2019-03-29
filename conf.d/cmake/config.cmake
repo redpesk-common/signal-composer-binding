@@ -72,6 +72,8 @@ set (PKG_REQUIRED_LIST
 	libsystemd>=222
 	afb-daemon>=4.0
 	uuid
+	afb-helpers
+	appcontroller
 )
 
 # Prefix path where will be installed the files

@@ -34,9 +34,3 @@ PROJECT_TARGET_ADD(signal-composer)
 	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		ctl-utilities
-		${link_libraries}
-	)

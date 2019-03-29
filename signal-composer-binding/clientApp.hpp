@@ -23,13 +23,13 @@ class clientAppCtx: public Observer<Signal>
 private:
 	std::string uuid_;
 	std::vector<std::shared_ptr<Signal>> subscribedSignals_;
-	AFB_EventT event_;
+	afb_event_t event_;
 public:
 	explicit clientAppCtx(const char* uuid);
 
 	void update(Signal* sig);
 	void appendSignals(std::vector<std::shared_ptr<Signal>>& sigV);
 	void subtractSignals(std::vector<std::shared_ptr<Signal>>& sigV);
-	int makeSubscription(AFB_ReqT  request);
-	int makeUnsubscription(AFB_ReqT  request);
+	int makeSubscription(afb_req_t  request);
+	int makeUnsubscription(afb_req_t  request);
 };

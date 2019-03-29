@@ -75,7 +75,7 @@ std::string SourceAPI::api() const
 /// @param[in] object - eventual data that comes with the event
 /// @param[in] object - the api that subscribed the event
 ///
-void SourceAPI::onSourceEvents(void *closure, const char *event_name, json_object *event_obj, AFB_ApiT api)
+void SourceAPI::onSourceEvents(void *closure, const char *event_name, json_object *event_obj, afb_api_t api)
 {
 	std::vector<std::shared_ptr<Signal>> signals { Composer::instance().searchSignals(event_name) };
 
@@ -132,7 +132,7 @@ void SourceAPI::onSourceEvents(void *closure, const char *event_name, json_objec
 /// @param[in] object - eventual data that comes with the event
 /// @param[in] object - the api that subscribed the event
 ///
-void SourceAPI::onSignalEvents(void *closure, const char *event_name, json_object *event_obj, AFB_ApiT api)
+void SourceAPI::onSignalEvents(void *closure, const char *event_name, json_object *event_obj, afb_api_t api)
 {
 	Signal *sig = (Signal*) closure;
 	sig->onReceivedCB(event_obj);
@@ -237,7 +237,7 @@ int SourceAPI::cleanNotSubscribedSignals() {
 	return erased;
 }
 
-int SourceAPI::makeSubscription(AFB_ReqT request)
+int SourceAPI::makeSubscription(afb_req_t request)
 {
 	int err = 0;
 	if(getSignals_)

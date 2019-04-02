@@ -310,6 +310,7 @@ void Signal::onReceivedCB(json_object *eventJ)
 	CtlSourceT source;
 	::memset(&source, 0, sizeof(CtlSourceT));
 	source.uid = id_.c_str();
+	source.api = afbBindingV3root;
 	source.context = (void*)get_context();
 	if (onReceived_)
 		ActionExecOne(&source, onReceived_, json_object_get(eventJ));

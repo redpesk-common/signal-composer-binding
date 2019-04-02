@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+#include <cstring>
 
 #include "source.hpp"
 #include "signal-composer.hpp"
@@ -47,7 +48,9 @@ void SourceAPI::init()
 	if(init_)
 	{
 		CtlSourceT source;
+		::memset(&source, 0, sizeof(CtlSourceT));
 		source.uid = init_->uid;
+		source.api = afbBindingV3root;
 		ActionExecOne(&source, init_, json_object_new_object());
 		std::string sourceAPI_events = api_ + "/*";
 		afb_api_event_handler_add(afbBindingV3root, sourceAPI_events.c_str(), SourceAPI::onSourceEvents, NULL);
@@ -240,7 +243,9 @@ int SourceAPI::makeSubscription(AFB_ReqT request)
 	if(getSignals_)
 	{
 		CtlSourceT source;
+		::memset(&source, 0, sizeof(CtlSourceT));
 		source.uid = api_.c_str();
+		source.api = afbBindingV3root;
 		source.request = request;
 		json_object *argsSaveJ = getSignals_->argsJ;
 

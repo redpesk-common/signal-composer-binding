@@ -8,7 +8,7 @@
 *.vcxproj
 *.user
 obj
-build
+build*
 bin
 src/configuration-generated.cpp
 docs_doxygen

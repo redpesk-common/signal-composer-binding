@@ -5,19 +5,13 @@
 			"uid": "latitude",
 			"event": "gps/location",
 			"unit": "degree",
-			"frequency": 1,
-			"onReceived": {
-				"action": "plugin://gps-callbacks#getLatitude"
-			}
+			"frequency": 1
 		},
 		{
 			"uid": "longitude",
 			"event": "gps/location",
 			"unit": "degree",
-			"frequency": 1,
-			"onReceived": {
-				"action": "plugin://gps-callbacks#getLongitude"
-			}
+			"frequency": 1
 		},
 		{
 			"uid": "altitude",
@@ -47,19 +41,19 @@
 		},
 		{
 			"uid": "climb",
-			"event": "mraa/getclimb",
+			"event": "gps/location",
 			"unit": "degree",
 			"frequency": 1
 		},
 		{
 			"uid": "roll_rate",
-			"event": "mraa/gyroscope",
+			"event": "gps/location",
 			"unit": "degree/s",
 			"frequency": 1
 		},
 		{
 			"uid": "pitch_rate",
-			"event": "mraa/gyroscope",
+			"event": "gps/location",
 			"unit": "degree/s",
 			"frequency": 1
 		},

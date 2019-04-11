@@ -5,13 +5,13 @@
 		"version": "1.0",
 		"api": "signal-composer",
 		"info": "Signal composer Configuration",
-		"require": ["low-can"]
+		"require": ["txc-binding"]
 	},
 	"plugins": [
 		{
-			"uid": "low-can-callbacks",
-			"info": "Manage interaction with low-can service",
-			"libs": "low-can.ctlso"
+			"uid": "convert",
+			"info": "LUA fonctions used to convert standard unit.",
+			"libs": "unit-conversion.lua"
 		},
 		{
 			"uid": "gps-callbacks",
@@ -19,15 +19,16 @@
 			"libs": "gps.ctlso"
 		},
 		{
-			"uid": "convert",
-			"info": "LUA fonctions used to convert standard unit.",
-			"libs": "unit-conversion.lua"
+			"uid": "builtin",
+			"info": "Builtin routine for onReceived or getSignals routines",
+			"libs": "builtin.ctlso",
+			"lua": { "prefix": "composer", "functions": "setSignalValueWrap"}
 		}
 	],
 	"signals": {
-		"files": ["sig-doors", "sig-demoboard", "sig-geoloc" ]
+		"files": ["sig-txc" ]
 	},
 	"sources": {
-		"files": "sources-basic"
+		"files": "sources-txc"
 	}
 }

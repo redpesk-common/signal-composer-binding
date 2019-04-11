@@ -22,11 +22,6 @@
 			"getSignals": {
 				"function": "lua://convert#_Simple_Echo_Args"
 				}
-		},
-		{
-			"uid": "MRAA-service",
-			"api": "mraa",
-			"info": "Low level binding which retrieve different values from several sensors like gyroscope, accelerometer, etc"
-			}
+		}
 		]
 	}

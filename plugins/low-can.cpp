@@ -52,7 +52,6 @@ void setDoor(doorT* aDoor, const char* eventName, json_object* eventStatus)
 	if(json_object_is_type(eventStatus, json_type_boolean)) {
 		if(strcasestr(eventName, "door")) aDoor->door = eventStatus;
 		else if(strcasestr(eventName, "window")) aDoor->window = eventStatus;
-		else AFB_WARNING("Unexpected behavior, this '%s' is not a door ! ", eventName);
 	}
 }
 
@@ -92,7 +91,7 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
 			"getSignalsArgs", &filterJ);
 		if(err)
 		{
-			AFB_ERROR("Problem to unpack JSON object eventJ: %s",
+			AFB_API_ERROR(source->api, "Problem to unpack JSON object eventJ: %s",
 			json_object_to_json_string(eventJ));
 			return err;
 		}
@@ -112,7 +111,7 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
 		"filter", subscribeFilterJ);
 		if(err)
 		{
-			AFB_ERROR("Error building subscription query object");
+			AFB_API_ERROR(source->api, "Error building subscription query object");
 			return err;
 		}
 		json_object_array_add(pluginCtx->subscriptionBatch, subscribeArgsJ);
@@ -120,10 +119,10 @@ CTLP_CAPI (subscribeToLow, source, argsJ, eventJ) {
 	else
 	{
 		json_object_get(pluginCtx->subscriptionBatch);
-		AFB_DEBUG("Calling subscribe with %s", json_object_to_json_string(pluginCtx->subscriptionBatch));
+		AFB_API_DEBUG(source->api, "Calling subscribe with %s", json_object_to_json_string(pluginCtx->subscriptionBatch));
 		err = afb_api_call_sync_legacy(source->api, "low-can", "subscribe", pluginCtx->subscriptionBatch, &responseJ);
 		if(err)
-			{AFB_ERROR("Subscribe to '%s' responseJ:%s", json_object_to_json_string(pluginCtx->subscriptionBatch), json_object_to_json_string(responseJ));}
+			{AFB_API_ERROR(source->api, "Subscribe to '%s' responseJ:%s", json_object_to_json_string(pluginCtx->subscriptionBatch), json_object_to_json_string(responseJ));}
 
 		// Renew subscription json object for the next time we need it
 		json_object_put(pluginCtx->subscriptionBatch);
@@ -146,7 +145,7 @@ CTLP_CAPI (isOpen, source, argsJ, eventJ) {
 		"timestamp", &timestamp);
 	if(err)
 	{
-		AFB_ERROR("Error parsing event %s", json_object_to_json_string(eventJ));
+		AFB_API_ERROR(source->api, "Error parsing event %s", json_object_to_json_string(eventJ));
 		return -1;
 	}
 
@@ -172,11 +171,11 @@ CTLP_CAPI (isOpen, source, argsJ, eventJ) {
 	}
 	else
 	{
-		AFB_WARNING("Unexpected behavior, this '%s' is it really a door ! ", json_object_to_json_string(eventJ));
+		AFB_API_WARNING(source->api, "Unexpected behavior, this '%s' is it really a door ! ", json_object_to_json_string(eventJ));
 		return -1;
 	}
 
-	AFB_DEBUG("This is the situation: source:%s, args:%s, event:%s,\n fld: %s, flw: %s, frd: %s, frw: %s, rld: %s, rlw: %s, rrd: %s, rrw: %s",
+	AFB_API_DEBUG(source->api, "This is the situation: source:%s, args:%s, event:%s,\n fld: %s, flw: %s, frd: %s, frw: %s, rld: %s, rlw: %s, rrd: %s, rrw: %s",
 	source->uid,
 	argsJ ? json_object_to_json_string(argsJ):"",
 	eventJ ? json_object_to_json_string(eventJ):"",

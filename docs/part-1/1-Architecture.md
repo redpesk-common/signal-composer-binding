@@ -11,7 +11,7 @@ Key here are on both layers, **low** and **high**.
 - **Low levels** binding used as _AGL service_, handle data exchange protocol to
  decode/encode and retransmit with an AGL compatible format using **Application
  Framework** events. These are divided into two parts, which are :
-  - A transport Layer binding's plug-in that is able to read/write a from a device.
+  - A transport Layer binding's plug-in that is able to read/write from a device.
   - Decoding/Encoding parts that expose signals.
 - **High level signal composer** binding gathers multiple **low level** signaling
  sources. Then from these sources, it exposes theirs **raw** signals or more interesting

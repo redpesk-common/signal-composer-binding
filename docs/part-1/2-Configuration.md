@@ -11,7 +11,7 @@ Saying that you have 4 sections to define:
 
 - **metadata**: Main parts and the only one that can't be in a separates
  configuration. This must appears in the main configuration file.
-- **plugins** (optionnal): Declare plugins that will be used by *sources* and
+- **plugins** (optional): Declare plugins that will be used by *sources* and
  *signals* for the subscription and composition.
 - **sources**: Declare **low level** signals sources (eg. low-can, gps, mraa,
  ...).
@@ -23,15 +23,15 @@ Here we define some metadata about **signal composer** binding. Fields to config
 are :
 
 - **uid**: self-explanatory
-- **version** (optionnal): self-explanatory
-- **api** (optionnal): name that the binding will be initialized to and later
+- **version** (optional): self-explanatory
+- **api** (optional): name that the binding will be initialized to and later
  be accessible by **Application Framework**
-- **info** (optionnal): self-explanatory
-- **require** (optionnal): list of required external apis.
+- **info** (optional): self-explanatory
+- **require** (optional): list of required external apis.
 
 ## Plugins
 
-This section is the only which is optionnal, it is needed if you develop
+This section is the only which is optional, it is needed if you develop
 specifics C/C++ plugins to be used with signal-composer. LUA and API
 consumption does not need plugins.
 
@@ -44,10 +44,10 @@ Fields are:
 
 - **uid**: Define the plugin name. This is that label that will be used on
  **sources** and **signals** callbacks.
-- **ldpath** (optionnal): path to the plugin directory
-- **info** (optionnal): self-explanatory
+- **ldpath** (optional): path to the plugin directory
+- **info** (optional): self-explanatory
 - **basename**: shared library file name **without** the extension.
-- **files** (optionnal): list of additionnals files. **ONLY NAME** or part of
+- **files** (optional): list of additionnals files. **ONLY NAME** or part of
  it, without extension. Don't mix up section object with this key, either one
  or the other but avoid using both
 
@@ -61,14 +61,14 @@ A source is defined with following fields:
 
 - **uid**: An unique identifier name for thatuid source API.
 - **api**: Name of the source API.
-- **info** (optionnal): self-explanatory
-- **init** (optionnal): an **action** to take to initialize a source. May you
+- **info** (optional): self-explanatory
+- **init** (optional): an **action** to take to initialize a source. May you
  have  to call a verb from that API, of create a files etc.
-- **getSignals** (optionnal); an **action** to take to get signals from that
+- **getSignals** (optional); an **action** to take to get signals from that
  source. These callback will be used for each signals defined later in the
  **signals** section. Dedicated arguments for each signal could be defined in
  **signals**.
-- **files** (optionnal): list of additionnals files. **ONLY NAME** or part of
+- **files** (optional): list of additionnals files. **ONLY NAME** or part of
  it, without extension. Don't mix up section object with this key, either one
  or the other but avoid using both
 
@@ -85,9 +85,9 @@ A signal definition could be either a **raw** one or a **virtual** one. A
 - **depends**: specify others signals **id** that compose it (eg: heading is
  composed with longitude+latitude signals.). Couldn't be used with **event**
  field at same time.
-- **retention** (optionnal): retention duration in seconds
-- **unit** (optionnal): Unit used to exprime the signal
-- **frequency** (optionnal): Frequency maximum at which the signal could be
+- **retention** (optional): retention duration in seconds
+- **unit** (optional): Unit used to exprime the signal
+- **frequency** (optional): Frequency maximum at which the signal could be
  requested or sent. This is a thinning made at **high level** so not best
  suited for performance. Used **low level** native filtering capabilities when
  possible.
@@ -95,6 +95,6 @@ A signal definition could be either a **raw** one or a **virtual** one. A
  filtering capabilities at subscription and to be able to customize in general
  a subcription request by signal if needed.
 - **onReceived**: an **action** to take when this signal is received!
-- **files** (optionnal): list of additionnals files. **ONLY NAME** or part of
+- **files** (optional): list of additionnals files. **ONLY NAME** or part of
  it, without extension. Don't mix up section object with this key, either one
  or the other but avoid using both

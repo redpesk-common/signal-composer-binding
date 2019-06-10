@@ -2,7 +2,8 @@
 
 Configuration defines all in **Signal composer** each signals and sources has
 to be defined in it. At start, configuration will be searched in default
-binding configuration directory which should be _/var/lib/afm/applications/signal-composer/1.0/etc/_.
+binding configuration directory which should be _/var/local/lib/afm/applications/signal-composer/VER/etc/_,
+VER is the version of **signal composer**.
 Binding search for a file name as _init-daemon*.json_. Others files could be
 used to split sections and don't have 1 big fat definitions file.
 
@@ -35,7 +36,7 @@ specifics C/C++ plugins to be used with signal-composer. LUA and API
 consumption does not need plugins.
 
 Default path to search for a plugin is in the binding library directory
-in a subdirectory _plugins_ _/var/lib/afm/applications/signal-composer/1.0/lib/plugins_.
+in a subdirectory _plugins_ _/var/local/lib/afm/applications/signal-composer/VER/lib/plugins_.
 Else you could use the environment variable _CONTROL_PLUGIN_PATH_ with a
 semicolon separated list of directory.
 

@@ -259,6 +259,11 @@ int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 		}
 		std::string api = eventStr.substr(0, sep);
 		src = getSourceAPI(api);
+		if(!src)
+		{
+			AFB_ERROR("Can't find the source API %s for the event %s. Check you configuration.", api.c_str(), eventStr.c_str());
+			return -1;
+		}
 	}
 	else
 	{

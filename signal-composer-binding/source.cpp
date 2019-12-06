@@ -147,7 +147,7 @@ void SourceAPI::addSignal(const std::string& id, const std::string& event, std::
 {
 	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, metadata, retention, frequency, onReceived, getSignalsArgs);
 
-	if(onReceived && ! event.empty())
+	if(!event.empty())
 		afb_api_event_handler_add(afbBindingV3root, event.c_str(), SourceAPI::onSignalEvents, (void*)sig.get());
 
 	newSignalsM_[id] = sig;

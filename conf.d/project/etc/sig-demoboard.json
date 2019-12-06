@@ -39,6 +39,25 @@
 			"retention":30,
 			"unit": "Nm",
 			"frequency": 1
+		},
+		{
+			"uid": "event.vehicle.speed",
+			"event": "low-can/messages.vehicle.average.speed",
+			"unit": "km/h"
+		},
+		{
+			"uid": "event.engine.speed",
+			"event": "low-can/messages.engine.speed",
+			"unit": "rpm"
+		},
+		{
+			"uid": "event.fuel.level",
+			"event": "low-can/messages.fuel.level",
+			"unit": "liters"
+		},
+		{
+			"uid": "event.fuel.level.low",
+			"event": "low-can/messages.fuel.level.low",
 		}
 	]
 }

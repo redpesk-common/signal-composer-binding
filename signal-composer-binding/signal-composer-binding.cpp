@@ -102,9 +102,17 @@ static void do_subscribe_unsubscribe(afb_req_t request, bool subscribe, clientAp
 	}
 
 	if(rc >= 0)
-		afb_req_success(request, NULL, NULL);
+	{
+		json_object *reply = json_object_new_object();
+		json_object_object_add(reply,
+				       "uuid",
+				       json_object_new_string(cContext->getUUID().c_str()));
+		afb_req_reply(request, reply, NULL, NULL);
+	}
 	else
+	{
 		afb_req_fail(request, "error", NULL);
+	}
 }
 
 /// @brief entry point for client un-subscription request.

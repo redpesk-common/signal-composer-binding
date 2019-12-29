@@ -32,4 +32,5 @@ public:
 	void subtractSignals(std::vector<std::shared_ptr<Signal>>& sigV);
 	int makeSubscription(afb_req_t  request);
 	int makeUnsubscription(afb_req_t  request);
+	std::string getUUID() { return std::string(uuid_); }
 };

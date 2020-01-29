@@ -46,19 +46,19 @@ static struct signalCBT pluginHandle = {
 };
 
 CtlSectionT Composer::ctlSections_[] = {
-	[0]={.key="plugins" , .uid="plugins", .info=nullptr, .prefix=nullptr,
+	[0]={.key="plugins" , .uid="plugins", .info=nullptr,
 		.loadCB=PluginConfig,
 		.handle=&pluginHandle,
 		.actions=nullptr},
-	[1]={.key="sources" , .uid="sources", .info=nullptr, .prefix=nullptr,
+	[1]={.key="sources" , .uid="sources", .info=nullptr,
 		 .loadCB=loadSourcesAPI,
 		 .handle=nullptr,
 		 .actions=nullptr},
-	[2]={.key="signals" , .uid="signals", .info=nullptr, .prefix=nullptr,
+	[2]={.key="signals" , .uid="signals", .info=nullptr,
 		 .loadCB=loadSignals,
 		 .handle=nullptr,
 		 .actions=nullptr},
-	[3]={.key=nullptr, .uid=nullptr, .info=nullptr, .prefix=nullptr,
+	[3]={.key=nullptr, .uid=nullptr, .info=nullptr,
 		 .loadCB=nullptr,
 		 .handle=nullptr,
 		 .actions=nullptr}

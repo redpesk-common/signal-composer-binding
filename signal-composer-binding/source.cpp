@@ -50,14 +50,14 @@ void SourceAPI::init()
 		CtlSourceT source;
 		::memset(&source, 0, sizeof(CtlSourceT));
 		source.uid = init_->uid;
-		source.api = afbBindingV3root;
+		source.api = afbBindingRoot;
 		ActionExecOne(&source, init_, json_object_new_object());
 		std::string sourceAPI_events = api_ + "/*";
-		afb_api_event_handler_add(afbBindingV3root, sourceAPI_events.c_str(), SourceAPI::onSourceEvents, NULL);
+		afb_api_event_handler_add(afbBindingRoot, sourceAPI_events.c_str(), SourceAPI::onSourceEvents, NULL);
 		return;
 	}
 
-	if(api_ == afbBindingV3root->apiname)
+	if(api_ == afbBindingRoot->apiname)
 		{api_ = Composer::instance().ctlConfig()->api;}
 }
 
@@ -148,7 +148,7 @@ void SourceAPI::addSignal(const std::string& id, const std::string& event, std::
 	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, metadata, retention, frequency, onReceived, getSignalsArgs);
 
 	if(!event.empty())
-		afb_api_event_handler_add(afbBindingV3root, event.c_str(), SourceAPI::onSignalEvents, (void*)sig.get());
+		afb_api_event_handler_add(afbBindingRoot, event.c_str(), SourceAPI::onSignalEvents, (void*)sig.get());
 
 	newSignalsM_[id] = sig;
 }
@@ -245,7 +245,7 @@ int SourceAPI::makeSubscription(afb_req_t request)
 		CtlSourceT source;
 		::memset(&source, 0, sizeof(CtlSourceT));
 		source.uid = api_.c_str();
-		source.api = afbBindingV3root;
+		source.api = afbBindingRoot;
 		source.request = request;
 		json_object *argsSaveJ = getSignals_->argsJ;
 

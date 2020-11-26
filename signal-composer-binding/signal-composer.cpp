@@ -135,7 +135,7 @@ int Composer::loadOneSourceAPI(afb_api_t apihandle, json_object* sourceJ)
 	if(ctlConfig_ && ctlConfig_->requireJ)
 	{
 		const char* requireS = json_object_to_json_string(ctlConfig_->requireJ);
-		if(!strcasestr(requireS, api) && !strcasestr(api, afbBindingV3root->apiname))
+		if(!strcasestr(requireS, api) && !strcasestr(api, afbBindingRoot->apiname))
 			{AFB_WARNING("Caution! You don't specify the API source as required in the metadata section. This API '%s' may not be initialized", api);}
 	}
 
@@ -173,7 +173,7 @@ int Composer::loadSourcesAPI(afb_api_t apihandle, CtlSectionT* section, json_obj
 		{
 			wrap_json_pack(&sigCompJ, "{ss,ss,ss}",
 			"uid", "Signal-Composer-service",
-			"api", afbBindingV3root->apiname,
+			"api", afbBindingRoot->apiname,
 			"info", "Api on behalf the virtual signals are sent");
 
 			if(json_object_is_type(sourcesJ, json_type_array))
@@ -435,14 +435,14 @@ int Composer::loadConfig(afb_api_t api, std::string& filepath)
 	const char *configPath = CtlConfigSearch(api, filepath.c_str(), "control");
 
 	if (!configPath) {
-		AFB_ERROR_V3("CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
+		AFB_ERROR("CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
 		return -1;
 	}
 
 	// create one API per file
 	ctlConfig_ = CtlLoadMetaData(api, configPath);
 	if (!ctlConfig_) {
-		AFB_ERROR_V3("CtrlPreInit No valid control config file in:\n-- %s", configPath);
+		AFB_ERROR("CtrlPreInit No valid control config file in:\n-- %s", configPath);
 		return -1;
 	}
 

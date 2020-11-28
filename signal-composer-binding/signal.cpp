@@ -78,7 +78,7 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
 		auth->next = nullptr;
 	}
 
-	if(afb_api_add_verb(afb_get_root_api(), id_.c_str(), "Signal verb to interact with", signal_verb, (void*)this, auth, 0, 0))
+	if(afb_api_add_verb(afbBindingRoot, id_.c_str(), "Signal verb to interact with", signal_verb, (void*)this, auth, 0, 0))
 		AFB_ERROR("Wrongly added verb to the API, this signal could not be reached using its dedicated verb.");
 }
 

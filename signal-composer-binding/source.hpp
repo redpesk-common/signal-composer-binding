@@ -39,7 +39,13 @@ private:
 
 public:
 	SourceAPI();
-	SourceAPI(const std::string& uid_, const std::string& api, const std::string& info, CtlActionT* init, CtlActionT* getSignal, CtlActionT* onReceived, int retention);
+	SourceAPI(const std::string& uid_,
+		const std::string& api,
+		const std::string& info,
+		CtlActionT* init,
+		CtlActionT* getSignal,
+		CtlActionT* onReceived,
+		int retention);
 
 	bool operator==(const SourceAPI& other) const;
 	bool operator==(const std::string& aName) const;
@@ -47,10 +53,25 @@ public:
 	void init();
 	std::string api() const;
 
-	static void onSourceEvents(void *closure, const char *event_name, json_object *event_obj, afb_api_t api);
-	static void onSignalEvents(void *closure, const char *event_name, json_object *event_obj, afb_api_t api);
+	static void onSourceEvents(void *closure,
+				const char *event_name,
+				json_object *event_obj,
+				afb_api_t api);
+	static void onSignalEvents(void *closure,
+				const char *event_name,
+				json_object *event_obj,
+				afb_api_t api);
 	const struct signalsDefault& signalsDefault() const;
-	void addSignal(const std::string& id, const std::string& event, std::vector<std::string>& sources, int retention, const std::string& unit, json_object *metadata, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs);
+	void addSignal(const std::string& id,
+			const std::string& event,
+			std::vector<std::string>& sources,
+			int retention,
+			const std::string& unit,
+			json_object *metadata,
+			double frequency,
+			CtlActionT* onReceived,
+			json_object* getSignalsArgs,
+			const char* permission);
 
 	void initSignals();
 	std::vector<std::shared_ptr<Signal>> getSignals() const;

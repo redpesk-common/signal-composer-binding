@@ -226,9 +226,9 @@ void get(afb_req_t request)
 	*options = nullptr, *error = nullptr, *object = nullptr;
 	const char* sig;
 
-	// Process about Raw CAN message on CAN bus directly
-	err = wrap_json_unpack(args, "{ss,s?o!}", "signal", &sig,
-			"options", &options);
+	err = wrap_json_unpack(args, "{ss,s?o!}",
+				"signal", &sig,
+				"options", &options);
 	if(err)
 	{
 		afb_req_fail(request, "error", "Valid arguments are:{'signal': 'wantedsignal'[, 'options': {['average': nb_seconds,] ['minimum': nb_seconds,] ['maximum': nb_seconds] }]");

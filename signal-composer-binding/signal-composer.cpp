@@ -214,7 +214,7 @@ int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 	json_object *onReceivedJ = nullptr,
 		    *dependsJ = nullptr,
 		    *metadataJ = nullptr,
-		    *getSignalsArgs = nullptr;
+		    *getSignalsArgsJ = nullptr;
 	CtlActionT* onReceivedCtl;
 	const char *id = nullptr,
 			   *event = nullptr,
@@ -229,7 +229,7 @@ int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 			"uid", &id,
 			"event", &event,
 			"depends", &dependsJ,
-			"getSignalsArgs", &getSignalsArgs,
+			"getSignalsArgs", &getSignalsArgsJ,
 			"retention", &retention,
 			"unit", &unit,
 			"metadata", &metadataJ,
@@ -280,7 +280,7 @@ int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 				std::string sourceStr = json_object_get_string(json_object_array_get_idx(dependsJ, i));
 				if( (sep = sourceStr.find("/")) != std::string::npos)
 				{
-					AFB_ERROR("Signal composition needs to use signal 'id', don't use full low level signal name");
+					AFB_ERROR("Signal composition needs to use signal 'uid', don't use full low level signal name");
 					return -1;
 				}
 				dependsV.push_back(sourceStr);
@@ -291,7 +291,7 @@ int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 			std::string sourceStr = json_object_get_string(dependsJ);
 			if( (sep = sourceStr.find("/")) != std::string::npos)
 			{
-				AFB_ERROR("Signal composition needs to use signal 'id', don't use full low level signal name");
+				AFB_ERROR("Signal composition needs to use signal 'uid', don't use full low level signal name");
 				return -1;
 			}
 			dependsV.push_back(sourceStr);

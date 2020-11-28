@@ -9,15 +9,13 @@
 		},
 		{
 			"uid": "longitude",
-			"event": "gps/location",
-			"unit": "degree",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "degree"
 		},
 		{
 			"uid": "altitude",
-			"event": "gps/location",
-			"unit": "meter",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "meter"
 		},
 		{
 			"uid": "heading",
@@ -27,119 +25,99 @@
 			],
 			"retention": 30,
 			"unit": "degree",
-			"frequency": 1,
 			"onReceived": {
 				"action": "plugin://gps-callbacks#getHeading"
 			}
 		},
 		{
 			"uid": "speed",
-			"event": "gps/location",
+			"depends": "latitude",
 			"retention": 30,
-			"unit": "m/s",
-			"frequency": 1
+			"unit": "m/s"
 		},
 		{
 			"uid": "climb",
 			"event": "gps/location",
-			"unit": "degree",
-			"frequency": 1
+			"unit": "degree"
 		},
 		{
 			"uid": "roll_rate",
-			"event": "gps/location",
-			"unit": "degree/s",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "degree/s"
 		},
 		{
 			"uid": "pitch_rate",
-			"event": "gps/location",
-			"unit": "degree/s",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "degree/s"
 		},
 		{
 			"uid": "yaw_rate",
 			"event": "gps/gyroscope",
-			"unit": "degree/s",
-			"frequency": 1
+			"unit": "degree/s"
 		},
 		{
 			"uid": "pdop",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "hdop",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "vdop",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "used_satellites",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "tracked_satellites",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "visible_satellites",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "sigma_hposition",
-			"event": "gps/location",
-			"unit": "meter",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "meter"
 		},
 		{
 			"uid": "sigma_altitude",
-			"event": "gps/location",
-			"unit": "meter",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "meter"
 		},
 		{
 			"uid": "sigma_heading",
-			"event": "gps/location",
-			"unit": "degree",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "degree"
 		},
 		{
 			"uid": "sigma_speed",
-			"event": "gps/location",
+			"depends": "latitude",
 			"retention": 30,
-			"unit": "m/s",
-			"frequency": 1
+			"unit": "m/s"
 		},
 		{
 			"uid": "sigma_climb",
-			"event": "gps/location",
-			"unit": "degree",
-			"frequency": 1
+			"depends": "latitude",
+			"unit": "degree"
 		},
 		{
 			"uid": "gnss_fix_status",
-			"event": "gps/location",
-			"frequency": 1
+			"depends": "latitude"
 		},
 		{
 			"uid": "dr_status",
-			"event": "gps/location",
-			"retention": 30,
-			"frequency": 1
+			"depends": "latitude",
+			"retention": 30
 		},
 		{
 			"uid": "reliabilty_index",
-			"event": "gps/location",
-			"retention": 30,
-			"frequency": 1
+			"depends": "latitude",
+			"retention": 30
 		}
 	]
 }

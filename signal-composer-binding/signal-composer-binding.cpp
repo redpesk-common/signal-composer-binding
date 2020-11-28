@@ -269,7 +269,7 @@ int execConf(afb_api_t api)
 {
 	Composer& composer = Composer::instance();
 	int err = 0;
-	CtlConfigExec(api, composer.ctlConfig());
+	err = CtlConfigExec(api, composer.ctlConfig());
 
 	AFB_DEBUG("Signal Composer Control configuration Done.");
 

@@ -30,6 +30,7 @@ class Composer;
 
 extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, json_object* value);
 extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, json_object* value);
+extern "C" void signal_verb(afb_req_t request);
 
 /// @brief Holds composer callbacks and obj to manipulate
 struct signalCBT
@@ -74,7 +75,8 @@ public:
 		int retention,
 		double frequency,
 		CtlActionT* onReceived,
-		json_object* getSignalsArgs);
+		json_object* getSignalsArgs,
+		const char* permission);
 	~Signal();
 
 	explicit operator bool() const;

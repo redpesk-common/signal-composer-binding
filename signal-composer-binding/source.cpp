@@ -143,9 +143,9 @@ const struct signalsDefault& SourceAPI::signalsDefault() const
 	return signalsDefault_;
 }
 
-void SourceAPI::addSignal(const std::string& id, const std::string& event, std::vector<std::string>& depends, int retention, const std::string& unit, json_object *metadata, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
+void SourceAPI::addSignal(const std::string& id, const std::string& event, std::vector<std::string>& depends, int retention, const std::string& unit, json_object *metadata, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs, const char* permission)
 {
-	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, metadata, retention, frequency, onReceived, getSignalsArgs);
+	std::shared_ptr<Signal> sig = std::make_shared<Signal>(id, event, depends, unit, metadata, retention, frequency, onReceived, getSignalsArgs, permission);
 
 	if(!event.empty())
 		afb_api_event_handler_add(afbBindingRoot, event.c_str(), SourceAPI::onSignalEvents, (void*)sig.get());

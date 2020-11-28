@@ -25,7 +25,31 @@
 
 #define USEC_TIMESTAMP_FLAG 1506514324881224
 
-Signal::Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, json_object *metadata, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs)
+extern "C" void signal_verb(afb_req_t request)
+{
+	json_object *actionJ = afb_req_json(request);
+	std::string action;
+	//Signal *sig = (Signal*) afb_req_get_vcbdata(request);
+
+	if(! json_object_is_type(actionJ, json_type_string))
+	{
+		afb_req_fail(request, "JSON argument isn't a string", "choose between 'get', 'subscribe', 'unsubscribe'");
+		return;
+	}
+
+	action = json_object_get_string(actionJ);
+
+	if(action == "get")
+		afb_req_success(request, nullptr, "get");
+	else if(action == "subscribe")
+		afb_req_success(request, nullptr, "subscribe");
+	else if(action == "unsubscribe")
+		afb_req_success(request, nullptr, "unsubscribe");
+	else
+		afb_req_fail(request, "JSON argument is not correct", "choose between 'get', 'subscribe', 'unsubscribe'");
+}
+
+Signal::Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, json_object *metadata, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs, const char* permission)
 :id_(id),
  event_(event),
  dependsSigV_(depends),
@@ -39,7 +63,24 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
  getSignalsArgs_(getSignalsArgs),
  signalCtx_({nullptr, nullptr, nullptr, nullptr}),
  subscribed_(false)
-{}
+{
+	struct afb_auth* auth = (struct afb_auth*) calloc(1, sizeof(struct afb_auth));
+	if(permission)
+	{
+		auth->type = afb_auth_Permission;
+		auth->text = permission;
+		auth->next = nullptr;
+	}
+	else
+	{
+		auth->type = afb_auth_Yes;
+		auth->loa = 0;
+		auth->next = nullptr;
+	}
+
+	if(afb_api_add_verb(afb_get_root_api(), id_.c_str(), "Signal verb to interact with", signal_verb, (void*)this, auth, 0, 0))
+		AFB_ERROR("Wrongly added verb to the API, this signal could not be reached using its dedicated verb.");
+}
 
 Signal::~Signal()
 {

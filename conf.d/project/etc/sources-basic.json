@@ -20,7 +20,7 @@
 				}
 			},
 			"getSignals": {
-				"function": "lua://convert#_Simple_Echo_Args"
+				"action": "lua://convert#_Simple_Echo_Args"
 				}
 		}
 		]

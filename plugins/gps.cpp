@@ -42,16 +42,17 @@ CTLP_CAPI (getHeading, source, argsJ, eventJ) {
 
 	lastSignal = json_object_array_get_idx(eventJ, json_object_array_length(eventJ) -1);
 
-	if(json_object_object_get_ex(lastSignal, "uid", &id) && std::string(json_object_get_string(id)) == "latitude" &&
-		json_object_object_get_ex(lastSignal, "value", &val)) {
+	if(json_object_object_get_ex(lastSignal, "uid", &id) &&
+	   std::string(json_object_get_string(id)) == "latitude" &&
+	   json_object_object_get_ex(lastSignal, "value", &val)) {
 			prvLat = curLat;
 			curLat = json_object_get_double(val);
 			coordUpdated = !coordUpdated;
 	}
 
 	if(json_object_object_get_ex(lastSignal, "uid", &id) &&
-	std::string(json_object_get_string(id)) == "longitude" &&
-	json_object_object_get_ex(lastSignal, "value", &val)) {
+	   std::string(json_object_get_string(id)) == "longitude" &&
+	   json_object_object_get_ex(lastSignal, "value", &val)) {
 		prvLon = curLon;
 		curLon = json_object_get_double(val);
 		coordUpdated = !coordUpdated;

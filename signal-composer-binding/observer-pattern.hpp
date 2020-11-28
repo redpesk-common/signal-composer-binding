@@ -89,7 +89,7 @@ public:
 	}
 
 	virtual int initialRecursionCheck() = 0;
-	virtual int recursionCheck(T* obs) = 0;
+	virtual int recursionCheck() = 0;
 
 	virtual ~Observable()
 	{

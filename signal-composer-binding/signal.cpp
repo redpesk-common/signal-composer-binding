@@ -545,7 +545,7 @@ int Signal::initialRecursionCheck()
 	{
 		if(obs == this)
 			{return -1;}
-		if(static_cast<Signal*>(obs)->recursionCheck(static_cast<Signal*>(obs)))
+		if(static_cast<Signal*>(obs)->recursionCheck())
 			{return -1;}
 	}
 	return 0;
@@ -557,14 +557,14 @@ int Signal::initialRecursionCheck()
 /// @param[in] origId - name of the origine of the recursion check
 ///
 /// @return 0 if no infinite loop detected, -1 if not.
-int Signal::recursionCheck(Signal* parentSig)
+int Signal::recursionCheck()
 {
 	for (const auto& obs: observerList_)
 	{
 		Signal* obsSig = static_cast<Signal*>(obs);
-		if(parentSig->id() == static_cast<Signal*>(obsSig)->id())
+		if(this->id() == obsSig->id())
 			{return -1;}
-		if(! obsSig->recursionCheck(obsSig))
+ 		if(obsSig->recursionCheck())
 			{return -1;}
 	}
 	return 0;

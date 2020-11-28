@@ -103,5 +103,5 @@ public:
 	uint64_t last_timestamp() const;
 
 	int initialRecursionCheck();
-	int recursionCheck(Signal* obs);
+	int recursionCheck();
 };

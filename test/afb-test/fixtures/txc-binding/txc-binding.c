@@ -191,7 +191,7 @@ static void *play_traces(void *opaque)
 					}
 
 					t = t + (long double)ts.tv_sec + ((long double)ts.tv_nsec / 1000000000.0);
-					json_object_object_add(object, "timestamp", json_object_new_double(t));
+					json_object_object_add(object, "timestamp", json_object_new_double((double)t));
 
 					send_trace(json_object_get_string(on), object);
 				}

@@ -34,49 +34,36 @@ void clientAppCtx::update(Signal* sig)
 		{json_object_put(sigJ);}
 }
 
-void clientAppCtx::appendSignals(std::vector<std::shared_ptr<Signal>>& sigV)
+void clientAppCtx::appendSignals(std::shared_ptr<Signal> sig)
 {
 	bool set = false;
 	// Clean up already subscribed signals to avoid duplicata
-	for (std::vector<std::shared_ptr<Signal>>::const_iterator it = sigV.cbegin();
-	it != sigV.cend(); ++it)
+	for (auto& ctxSig: subscribedSignals_)
+		if(sig == ctxSig)
+			set = true;
+	if (set)
 	{
-		std::shared_ptr<Signal> sig = nullptr;
-		for (auto& ctxSig: subscribedSignals_)
-			{if(*it == ctxSig) {set = true;}}
-		if (set)
-		{
-			set = false;
-			sigV.erase(it);
-		}
-		else
-		{
-			std::shared_ptr<Signal> sig = *it;
-			sig->addObserver(this);
-		}
+		AFB_INFO("Already subscribed, ignoring...");
+		return;
 	}
 
-	subscribedSignals_.insert(subscribedSignals_.end(), sigV.begin(), sigV.end());
+	sig->addObserver(this);
+	subscribedSignals_.push_back(sig);
 }
 
-void clientAppCtx::subtractSignals(std::vector<std::shared_ptr<Signal>>& sigV)
+void clientAppCtx::subtractSignals(std::shared_ptr<Signal> sig)
 {
 	// Clean up already subscribed signals to avoid duplicata
-	for (std::vector<std::shared_ptr<Signal>>::const_iterator it = sigV.cbegin();
-	it != sigV.cend(); ++it)
+	for (auto ctxSig = subscribedSignals_.cbegin(); ctxSig != subscribedSignals_.cend();ctxSig++)
 	{
-		for (auto ctxSig = subscribedSignals_.cbegin(); ctxSig != subscribedSignals_.cend();ctxSig++)
+		if(sig == *ctxSig)
 		{
-			if(*it == *ctxSig)
-			{
-				subscribedSignals_.erase(ctxSig);
-				break;
-			}
+			subscribedSignals_.erase(ctxSig);
+			break;
 		}
-		std::shared_ptr<Signal> sig = *it;
-		sig->delObserver(this);
-		AFB_NOTICE("Signal %s delete from subscription", sig->id().c_str());
 	}
+	sig->delObserver(this);
+	AFB_INFO("Signal %s delete from subscription", sig->id().c_str());
 }
 
 int clientAppCtx::makeSubscription(afb_req_t request)

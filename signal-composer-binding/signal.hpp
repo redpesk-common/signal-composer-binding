@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 #include <ctl-config.h>
 
 #include "observer-pattern.hpp"
@@ -48,7 +49,7 @@ struct signalCBT
 ///  is the behavior retained to compose virtual signals based on raw signals.
 ///  And this is the way that is used to update and reacts to an underlaying
 ///  signal change.
-class Signal: public Observable<Signal>, public Observer<Signal>
+class Signal: public std::enable_shared_from_this<Signal>, public Observable<Signal>, public Observer<Signal>
 {
 private:
 	std::string id_;
@@ -84,6 +85,7 @@ public:
 	bool operator!=(const Signal& other) const;
 	bool operator==(const std::string& aName) const;
 	bool operator!=(const std::string& aName) const;
+	std::shared_ptr<Signal> get_shared_ptr();
 
 	const std::string id() const;
 	json_object* toJSON() const;

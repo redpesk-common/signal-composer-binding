@@ -58,5 +58,5 @@ public:
 	CtlConfigT* ctlConfig();
 	std::vector<std::shared_ptr<Signal>> getAllSignals();
 	std::vector<std::shared_ptr<Signal>> searchSignals(const std::string& aName);
-	json_object* getsignalValue(const std::string& sig, json_object* options);
+	json_object* getSignalValue(std::shared_ptr<Signal> sig, json_object* options);
 };

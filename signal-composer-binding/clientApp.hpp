@@ -28,8 +28,8 @@ public:
 	explicit clientAppCtx(const char* uuid);
 
 	void update(Signal* sig);
-	void appendSignals(std::vector<std::shared_ptr<Signal>>& sigV);
-	void subtractSignals(std::vector<std::shared_ptr<Signal>>& sigV);
+	void appendSignals(std::shared_ptr<Signal> sig);
+	void subtractSignals(std::shared_ptr<Signal> sig);
 	int makeSubscription(afb_req_t  request);
 	int makeUnsubscription(afb_req_t  request);
 	std::string getUUID() { return std::string(uuid_); }

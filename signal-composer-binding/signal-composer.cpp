@@ -550,7 +550,7 @@ std::vector<std::shared_ptr<Signal>> Composer::searchSignals(const std::string& 
 	return signals;
 }
 
-json_object* Composer::getsignalValue(const std::string& sig, json_object* options)
+json_object* Composer::getSignalValue(std::shared_ptr<Signal> sig, json_object* options)
 {
 	std::map<std::string, int> opts;
 	json_object *response = nullptr, *finalResponse = json_object_new_array();
@@ -567,23 +567,17 @@ json_object* Composer::getsignalValue(const std::string& sig, json_object* optio
 		return finalResponse;
 	}
 
-	std::vector<std::shared_ptr<Signal>> sigP = searchSignals(sig);
-	if(!sigP.empty())
+	wrap_json_pack(&response, "{ss}",
+			"signal", sig->id().c_str());
+	if (opts.empty())
 	{
-		for(auto& sig: sigP)
-		{
-			wrap_json_pack(&response, "{ss}",
-				"signal", sig->id().c_str());
-			if (opts.empty())
-			{
-				json_object* value = sig->last_value();
-				json_object_object_add(response, "value", value);
-			}
-			else
-				{processOptions(opts, sig, response);}
-			json_object_array_add(finalResponse, response);
-		}
+		json_object* value = sig->last_value();
+		json_object_object_add(response, "value", value);
 	}
+	else
+		{processOptions(opts, sig, response);}
+
+	json_object_array_add(finalResponse, response);
 
 	return finalResponse;
 }

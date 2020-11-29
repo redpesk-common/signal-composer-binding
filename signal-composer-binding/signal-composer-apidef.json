@@ -100,40 +100,6 @@
 	}
 	},
 	"paths": {
-		"/subscribe": {
-			"description": "Subscribe to a signal object",
-			"parameters": [
-				{
-					"in": "query",
-					"name": "event",
-					"required": false,
-					"schema": { "type": "string" }
-				}
-			],
-			"responses": {
-				"200": {"$ref": "#/components/responses/200"}
-			}
-		},
-		"/unsubscribe": {
-			"description": "Unsubscribe previously suscribed signal objects.",
-			"parameters": [
-				{
-					"in": "query",
-					"name": "event",
-					"required": false,
-					"schema": { "type": "string" }
-				}
-			],
-			"responses": {
-				"200": {"$ref": "#/components/responses/200"}
-			}
-		},
-		"/get": {
-			"description": "Get informations about a resource or element",
-			"responses": {
-				"200": {"$ref": "#/components/responses/200"}
-			}
-		},
 		"/list": {
 			"description": "List all signals already configured",
 			"responses": {

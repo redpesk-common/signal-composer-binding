@@ -22,29 +22,47 @@
 
 #include "signal.hpp"
 #include "signal-composer.hpp"
+#include "clientApp.hpp"
 
 #define USEC_TIMESTAMP_FLAG 1506514324881224
 
 extern "C" void signal_verb(afb_req_t request)
 {
-	json_object *actionJ = afb_req_json(request);
+	Composer& composer = Composer::instance();
+	json_object *actionJ = afb_req_json(request),
+		    *optionsJ = nullptr,
+		    *ret = nullptr;
 	std::string action;
-	//Signal *sig = (Signal*) afb_req_get_vcbdata(request);
 
-	if(! json_object_is_type(actionJ, json_type_string))
+	Signal* sigraw = (Signal*) afb_req_get_vcbdata(request);
+	std::shared_ptr<Signal> sig = sigraw->get_shared_ptr();
+
+	if(json_object_object_get_ex(actionJ, "get", &optionsJ))
 	{
-		afb_req_fail(request, "JSON argument isn't a string", "choose between 'get', 'subscribe', 'unsubscribe'");
-		return;
+		ret = composer.getSignalValue(sig, optionsJ);
+		afb_req_success(request, ret, "get");
 	}
-
-	action = json_object_get_string(actionJ);
-
-	if(action == "get")
-		afb_req_success(request, nullptr, "get");
-	else if(action == "subscribe")
-		afb_req_success(request, nullptr, "subscribe");
-	else if(action == "unsubscribe")
-		afb_req_success(request, nullptr, "unsubscribe");
+	else if(json_object_is_type(actionJ, json_type_string))
+	{
+		clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
+		action = json_object_get_string(actionJ);
+		if(action == "subscribe")
+		{
+			cContext->appendSignals(sig);
+			if(cContext->makeSubscription(request))
+				afb_req_fail_f(request, "Subscription of signal '%s' failed.", sig->id().c_str());
+			else
+				afb_req_success(request, nullptr, "subscribe");
+		}
+		else if(action == "unsubscribe")
+		{
+			cContext->subtractSignals(sig);
+			if(cContext->makeUnsubscription(request))
+				afb_req_fail_f(request, "Unsubscription of signal '%s' failed.", sig->id().c_str());
+			else
+				afb_req_success(request, nullptr, "unsubscribe");
+		}
+	}
 	else
 		afb_req_fail(request, "JSON argument is not correct", "choose between 'get', 'subscribe', 'unsubscribe'");
 }
@@ -78,8 +96,13 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
 		auth->next = nullptr;
 	}
 
-	if(afb_api_add_verb(afbBindingRoot, id_.c_str(), "Signal verb to interact with", signal_verb, (void*)this, auth, 0, 0))
+	if(afb_api_add_verb(afbBindingRoot, id.c_str(),
+	   "Signal verb to interact with",
+	   signal_verb,
+	   (void*)this,
+	   auth, 0, 0))
 		AFB_ERROR("Wrongly added verb to the API, this signal could not be reached using its dedicated verb.");
+
 }
 
 Signal::~Signal()
@@ -124,6 +147,11 @@ bool Signal::operator !=(const std::string& aName) const
 		{return true;}
 
 	return false;
+}
+
+std::shared_ptr<Signal> Signal::get_shared_ptr()
+{
+	return shared_from_this();
 }
 
 const std::string Signal::id() const

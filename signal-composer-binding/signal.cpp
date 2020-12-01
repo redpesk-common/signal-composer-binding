@@ -381,10 +381,11 @@ void Signal::onReceivedCB(json_object *eventJ)
 	source.uid = id_.c_str();
 	source.api = afbBindingRoot;
 	source.context = (void*)get_context();
+	// Always call the default CB that will set the value in the signal's value
+	defaultReceivedCB(this, eventJ);
 	if (onReceived_)
 		ActionExecOne(&source, onReceived_, json_object_get(eventJ));
-	else
-		defaultReceivedCB(this, eventJ);
+
 }
 
 /// @brief Make a Signal observer observes Signals observables

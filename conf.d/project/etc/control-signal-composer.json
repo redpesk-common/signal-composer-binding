@@ -25,7 +25,7 @@
 		}
 	],
 	"signals": {
-		"files": [ "sig-doors", "sig-demoboard", "sig-steering-wheel", "sig-geoloc" ]
+		"files": [ "sig-geoloc" ]
 	},
 	"sources": {
 		"files": "sources-basic"

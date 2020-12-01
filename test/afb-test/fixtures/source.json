@@ -1,8 +1,0 @@
-{
-	"$schema": "http://iot.bzh/download/public/schema/json/signal-composer-schema.json",
-	"sources": {
-			"uid": "Dummy_Source",
-			"api": "dummy",
-			"info": "A dummy source to be used as test source"
-		}
-	}

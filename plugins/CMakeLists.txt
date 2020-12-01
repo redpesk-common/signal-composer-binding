@@ -21,6 +21,8 @@ PROJECT_TARGET_ADD(builtin)
 		# Define targets
 		ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
 
+		target_link_libraries(${TARGET_NAME} signal-composer)
+
 		# Alsa Plugin properties
 		SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 				LABELS "PLUGIN"

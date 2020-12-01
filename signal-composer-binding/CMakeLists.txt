@@ -21,7 +21,29 @@
 PROJECT_TARGET_ADD(signal-composer)
 
 	# Define project Targets
-	add_library(${TARGET_NAME} MODULE ${TARGET_NAME}-binding.cpp ${TARGET_NAME}.cpp source.cpp signal.cpp clientApp.cpp)
+	add_library(${TARGET_NAME} SHARED ${TARGET_NAME}.cpp source.cpp signal.cpp clientApp.cpp)
+
+	# Binder exposes a unique public entry point
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+	LABELS "LIBRARY"
+	IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET_NAME}.so
+	)
+
+	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+# Add target to project dependency list
+PROJECT_TARGET_ADD(signal-composer-binding)
+
+	# Define project Targets
+	add_library(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
+
+	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+	TARGET_LINK_LIBRARIES(${TARGET_NAME} signal-composer)
 
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
@@ -29,8 +51,4 @@ PROJECT_TARGET_ADD(signal-composer)
 		LABELS "BINDINGV3"
 		LINK_FLAGS ${BINDINGS_LINK_FLAG}
 		OUTPUT_NAME ${TARGET_NAME}
-	)
-
-	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
-		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 	)

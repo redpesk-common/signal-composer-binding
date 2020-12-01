@@ -92,6 +92,8 @@ public:
 	struct signalCBT* get_context();
 	json_object *getSignalsArgs();
 
+	json_object* config() const;
+	int change(json_object* config);
 	void set(uint64_t timestamp, json_object*& value);
 	void update(Signal* sig);
 	static void defaultReceivedCB(Signal *signal, json_object *eventJ);

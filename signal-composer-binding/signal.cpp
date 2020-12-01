@@ -42,11 +42,22 @@ extern "C" void signal_verb(afb_req_t request)
 		ret = composer.getSignalValue(sig, optionsJ);
 		afb_req_success(request, ret, "get");
 	}
+	else if(json_object_object_get_ex(actionJ, "change", &optionsJ))
+	{
+		if(sig->change(optionsJ))
+			afb_req_fail_f(request, "Changing the configuration of signal '%s' failed.", sig->id().c_str());
+		else
+			afb_req_success(request, ret, "config");
+	}
 	else if(json_object_is_type(actionJ, json_type_string))
 	{
 		clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
 		action = json_object_get_string(actionJ);
-		if(action == "subscribe")
+		if(action == "config")
+		{
+			afb_req_success(request, sig->config(), "config");
+		}
+		else if(action == "subscribe")
 		{
 			cContext->appendSignals(sig);
 			if(cContext->makeSubscription(request))
@@ -102,7 +113,6 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
 	   (void*)this,
 	   auth, 0, 0))
 		AFB_ERROR("Wrongly added verb to the API, this signal could not be reached using its dedicated verb.");
-
 }
 
 Signal::~Signal()
@@ -242,6 +252,64 @@ struct signalCBT* Signal::get_context()
 json_object *Signal::getSignalsArgs()
 {
 	return getSignalsArgs_;
+}
+
+/// @brief Accessor to retrieve only the modifiable configuration attributes.
+/// metadata, retention, unit and frequency.
+///
+/// @return a pointer the json_object with the configuration attributes
+json_object* Signal::config() const
+{
+	json_object* sigJ = json_object_new_object();
+
+	if (!unit_.empty())
+		json_object_object_add(sigJ, "unit", json_object_new_string(unit_.c_str()));
+	if (!metadata_)
+		json_object_object_add(sigJ, "metadata", json_object_get(metadata_));
+	if (frequency_)
+		json_object_object_add(sigJ, "frequency", json_object_new_double(frequency_));
+	if (retention_)
+		json_object_object_add(sigJ, "retention", json_object_new_int(retention_));
+
+	return sigJ;
+}
+
+/// @brief Accessor to change the modifiable attributes of the signal
+/// metadata, retention, unit and frequency.
+///
+/// @return 0 on success and other on failure.
+int Signal::change(json_object* config)
+{
+	json_object *optionsJ = nullptr;
+
+	if(json_object_object_get_ex(config, "retention", &optionsJ) &&
+	   json_object_is_type(optionsJ, json_type_int))
+		retention_ = json_object_get_int(optionsJ);
+	else
+		return -1;
+
+	if(json_object_object_get_ex(config, "frequency", &optionsJ) &&
+	   json_object_is_type(optionsJ, json_type_double))
+		frequency_ = json_object_get_int(optionsJ);
+	else
+		return -1;
+
+	if(json_object_object_get_ex(config, "unit", &optionsJ) &&
+	   json_object_is_type(optionsJ, json_type_string))
+		unit_ = json_object_get_string(optionsJ);
+	else
+		return -1;
+
+	if(json_object_object_get_ex(config, "metadata", &optionsJ) &&
+	   json_object_is_type(optionsJ, json_type_object))
+	{
+		json_object_put(metadata_);
+		metadata_ = json_object_get(optionsJ);
+	}
+	else
+		{return -1;}
+
+	return 0;
 }
 
 /// @brief Set Signal timestamp and value property when an incoming

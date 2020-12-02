@@ -29,15 +29,11 @@
 
 class Composer;
 
-extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, json_object* value);
-extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, json_object* value);
 extern "C" void signal_verb(afb_req_t request);
 
 /// @brief Holds composer callbacks and obj to manipulate
 struct signalCBT
 {
-	void (*searchNsetSignalValue)(const char* aName, uint64_t timestamp, json_object* value);
-	void (*setSignalValue)(void* aSignal, uint64_t timestamp, json_object* value);
 	void* aSignal;
 	void* pluginCtx;
 };
@@ -94,7 +90,7 @@ public:
 
 	json_object* config() const;
 	int change(json_object* config);
-	void set(uint64_t timestamp, json_object*& value);
+	void set(uint64_t timestamp, json_object* value);
 	void update(Signal* sig);
 	static void defaultReceivedCB(Signal *signal, json_object *eventJ);
 	void onReceivedCB(json_object *eventJ);

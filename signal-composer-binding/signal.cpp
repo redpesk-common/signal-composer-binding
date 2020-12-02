@@ -90,7 +90,7 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
  metadata_(metadata),
  onReceived_(onReceived),
  getSignalsArgs_(getSignalsArgs),
- signalCtx_({nullptr, nullptr, nullptr, nullptr}),
+ signalCtx_({nullptr, nullptr}),
  subscribed_(false)
 {
 	struct afb_auth* auth = (struct afb_auth*) calloc(1, sizeof(struct afb_auth));
@@ -228,15 +228,9 @@ json_object* Signal::toJSON() const
 /// @return a pointer to the signalCtx_ member initialized.
 struct signalCBT* Signal::get_context()
 {
-	if(!signalCtx_.aSignal ||
-		!signalCtx_.searchNsetSignalValue ||
-		!signalCtx_.setSignalValue)
+	if(!signalCtx_.aSignal)
 	{
-		signalCtx_.searchNsetSignalValue = searchNsetSignalValueHandle;
-		signalCtx_.setSignalValue = setSignalValueHandle;
-
 		signalCtx_.aSignal = (void*)this;
-
 		signalCtx_.pluginCtx = onReceived_ && onReceived_->type == CTL_TYPE_CB
 		&& onReceived_->exec.cb.plugin ?
 			onReceived_->exec.cb.plugin->context:
@@ -319,7 +313,7 @@ int Signal::change(json_object* config)
 ///
 /// @param[in] timestamp - timestamp of occured signal
 /// @param[in] value - value of change
-void Signal::set(uint64_t timestamp, json_object*& value)
+void Signal::set(uint64_t timestamp, json_object* value)
 {
 	uint64_t diff = retention_+1;
 	value_ = value;

@@ -21,26 +21,8 @@
 
 #include "clientApp.hpp"
 
-extern "C" void searchNsetSignalValueHandle(const char* aName, uint64_t timestamp, json_object* value)
-{
-	std::vector<std::shared_ptr<Signal>> signals = Composer::instance().searchSignals(aName);
-	if(!signals.empty())
-	{
-		for(auto& sig: signals)
-			{sig->set(timestamp, value);}
-	}
-}
-
-extern "C" void setSignalValueHandle(void* aSignal, uint64_t timestamp, json_object* value)
-{
-	Signal* sig = static_cast<Signal*>(aSignal);
-	sig->set(timestamp, value);
-}
-
 // aSignal member value will be initialized in sourceAPI->addSignal()
 static struct signalCBT pluginHandle = {
-	.searchNsetSignalValue = searchNsetSignalValueHandle,
-	.setSignalValue = setSignalValueHandle,
 	.aSignal = nullptr,
 	.pluginCtx = nullptr,
 };

@@ -151,22 +151,18 @@ CTLP_CAPI (isOpen, source, argsJ, eventJ) {
 
 	if(strcasestr(eventName, "front_left"))
 	{
-		context->searchNsetSignalValue(eventName,(uint64_t)timestamp, eventStatus);
 		setDoor(&pluginCtx->allDoorsCtx.front_left, eventName, eventStatus);
 	}
 	else if(strcasestr(eventName, "front_right"))
 	{
-		context->searchNsetSignalValue(eventName,(uint64_t)timestamp, eventStatus);
 		setDoor(&pluginCtx->allDoorsCtx.front_right, eventName, eventStatus);
 	}
 	else if(strcasestr(eventName, "rear_left"))
 	{
-		context->searchNsetSignalValue(eventName,(uint64_t)timestamp, eventStatus);
 		setDoor(&pluginCtx->allDoorsCtx.rear_left, eventName, eventStatus);
 	}
 	else if(strcasestr(eventName, "rear_right"))
 	{
-		context->searchNsetSignalValue(eventName,(uint64_t)timestamp, eventStatus);
 		setDoor(&pluginCtx->allDoorsCtx.rear_right, eventName, eventStatus);
 	}
 	else

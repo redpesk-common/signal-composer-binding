@@ -18,7 +18,7 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME signal-composer)
+set(PROJECT_NAME signal-composer-binding)
 set(PROJECT_PRETTY_NAME "Signal composer")
 set(PROJECT_DESCRIPTION "Signal composer API connected to low level AGL services")
 set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/#/admin/projects/apps/agl-service-signal-composer")

@@ -320,7 +320,7 @@ int Composer::loadOneSignal(afb_api_t apihandle, json_object* signalJ)
 
 	// Set default onReceived action if not specified
 	char uid[CONTROL_MAXPATH_LEN] = "onReceived_";
-	strncat(uid, id, strlen(id));
+	strncat(uid, id, CONTROL_MAXPATH_LEN - strlen(uid) - 1);
 
 	if(!onReceivedJ)
 	{

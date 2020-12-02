@@ -79,7 +79,7 @@ set (PKG_REQUIRED_LIST
 # Prefix path where will be installed the files
 # Default: /usr/local (need root permission to write in)
 # ------------------------------------------------------
-set(INSTALL_PREFIX $ENV{HOME}/opt/AGL)
+set(INSTALL_PREFIX $ENV{HOME}/opt)
 
 # Customize link option
 # -----------------------------

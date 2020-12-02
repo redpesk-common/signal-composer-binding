@@ -31,13 +31,12 @@ PROJECT_TARGET_ADD(builtin)
 				OUTPUT_NAME ${TARGET_NAME}
 		)
 
-		target_include_directories(${TARGET_NAME}
-		PRIVATE "../signal-composer-binding")
-
 PROJECT_TARGET_ADD(low-can)
 
 	# Define targets
 	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
+
+	target_link_libraries(${TARGET_NAME} signal-composer)
 
 	# Alsa Plugin properties
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
@@ -46,15 +45,14 @@ PROJECT_TARGET_ADD(low-can)
 		SUFFIX ".ctlso"
 		OUTPUT_NAME ${TARGET_NAME}
 	)
-
-	target_include_directories(${TARGET_NAME}
-		PRIVATE "../signal-composer-binding")
 
 PROJECT_TARGET_ADD(gps)
 
 	# Define targets
 	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
 
+	target_link_libraries(${TARGET_NAME} signal-composer)
+
 	# Alsa Plugin properties
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 		LABELS "PLUGIN"
@@ -62,6 +60,3 @@ PROJECT_TARGET_ADD(gps)
 		SUFFIX ".ctlso"
 		OUTPUT_NAME ${TARGET_NAME}
 	)
-
-	target_include_directories(${TARGET_NAME}
-	PRIVATE "../signal-composer-binding")

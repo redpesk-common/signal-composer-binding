@@ -22,7 +22,7 @@
 #include <filescan-utils.h>
 #include <afb/afb-binding>
 
-#include "signal-composer-apidef.h"
+#include "signal-composer-binding-apidef.h"
 #include "clientApp.hpp"
 
 /// @brief verb that loads JSON configuration to add sources and/or signals

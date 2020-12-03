@@ -54,15 +54,15 @@ private:
 	uint64_t timestamp_;
 	json_object* value_;
 	std::map<uint64_t, json_object*> history_; ///< history_ - Hold signal value history in map with <timestamp, value>
-	int retention_;
-	double frequency_;
-	std::string unit_;
-	json_object* metadata_;
 	CtlActionT* onReceived_;
 	json_object* getSignalsArgs_;
 	struct signalCBT signalCtx_;
 
 public:
+	int retention_;
+	double frequency_;
+	std::string unit_;
+	json_object* metadata_;
 	bool subscribed_; ///< subscribed_ - boolean value telling if yes or no the signal has been subcribed to the low level binding.
 	Signal(const std::string& id,
 		const std::string& event,

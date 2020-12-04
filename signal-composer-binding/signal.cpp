@@ -75,7 +75,7 @@ extern "C" void signal_verb(afb_req_t request)
 		}
 	}
 	else
-		afb_req_fail(request, "JSON argument is not correct", "choose between 'get', 'subscribe', 'unsubscribe'");
+		afb_req_fail(request, "JSON argument is not correct", "choose between 'get', 'config', 'change', 'subscribe', 'unsubscribe'");
 }
 
 Signal::Signal(const std::string& id, const std::string& event, std::vector<std::string>& depends, const std::string& unit, json_object *metadata, int retention, double frequency, CtlActionT* onReceived, json_object* getSignalsArgs, const char* permission)
@@ -445,11 +445,10 @@ void Signal::onReceivedCB(json_object *eventJ)
 	source.context = (void*)get_context();
 	// Always call the default CB that will set the value in the signal's value
 	// if the signal is a raw event instead.
-	if(! event_.empty())
-		defaultReceivedCB(this, eventJ);
 	if (onReceived_)
 		ActionExecOne(&source, onReceived_, json_object_get(eventJ));
-
+	if(!event_.empty())
+		defaultReceivedCB(this, eventJ);
 }
 
 /// @brief Make a Signal observer observes Signals observables

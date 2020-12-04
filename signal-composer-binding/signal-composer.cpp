@@ -564,6 +564,131 @@ json_object* Composer::getSignalValue(std::shared_ptr<Signal> sig, json_object* 
 	return finalResponse;
 }
 
+json_object *getVerbUsage()
+{
+	json_object *usage;
+	int err;
+	err = wrap_json_pack(&usage, "{s:[s s s s s] s:s}",
+		"action",
+		"get", "config", "change", "subscribe", "unsubscribe",
+		"data", "json_object");
+	if(err)
+		return NULL;
+	return usage;
+}
+
+json_object *getVerbSample()
+{
+	int err;
+	json_object *sample;
+	json_object *tmp;
+	json_object *arg;
+
+	sample = json_object_new_array();
+	err = wrap_json_pack(&arg, "{s:i}",
+		"average", 1);
+	if(err)
+		goto FAILURE;
+	err = wrap_json_pack(&tmp, "{s:s s:o}",
+		"action", "get",
+		"data", arg);
+	if(err)
+		goto FAILURE;
+	json_object_array_add(sample, tmp);
+	err = wrap_json_pack(&tmp, "{s:s}",
+		"action", "config");
+	if(err)
+		goto FAILURE;
+	json_object_array_add(sample, tmp);
+	err = wrap_json_pack(&arg, "{s:i}",
+		"retention", 1);
+	if(err)
+		goto FAILURE;
+	err = wrap_json_pack(&tmp, "{s:s s:o}",
+		"action", "change",
+		"data", arg);
+	if(err)
+		goto FAILURE;
+	json_object_array_add(sample, tmp);
+	err = wrap_json_pack(&tmp, "{s:s}",
+		"action", "subscribe");
+	if(err)
+		goto FAILURE;
+	json_object_array_add(sample, tmp);
+	err = wrap_json_pack(&tmp, "{s:s}",
+		"action", "unsubscribe");
+	if(err)
+		goto FAILURE;
+	json_object_array_add(sample, tmp);
+	return sample;
+	FAILURE:
+	return NULL;
+}
+
+void Composer::setInfo(json_object *verbInfo)
+{
+	int err;
+	json_object *metadata;
+	json_object *groups;
+	json_object *verbs;
+	json_object *tmp;
+
+	err = wrap_json_pack(&metadata, "{s:s s:s* s:s*}",
+		"uid", ctlConfig_->uid,
+		"info", ctlConfig_->info,
+		"version", ctlConfig_->version);
+	if(err)
+		goto FAILURE;
+	groups = json_object_new_array();
+	for(std::shared_ptr<SourceAPI> src: sourcesListV_)
+	{
+		verbs = json_object_new_array();
+		if(src->api() != std::string(ctlConfig_->api))
+		{
+			for(std::shared_ptr<Signal> sig: src->getSignals())
+			{
+				err = wrap_json_pack(&tmp, "{s:s s:s s:o* s:o*}",
+				"uid", sig->id().c_str(),
+				"verb", sig->id().c_str(),
+				"usage", getVerbUsage(),
+				"sample", getVerbSample());
+				if(err)
+					goto FAILURE;
+				json_object_array_add(verbs, tmp);
+			}
+			err = wrap_json_pack(&tmp, "{s:s s:s* s:s* s:o*}",
+			"uid", src->uid().c_str(),
+			"api", src->api().c_str(),
+			"info", src->info().c_str(),
+			"verbs", verbs);
+			if(err)		
+				goto FAILURE;		
+		}
+		else
+		{
+			err = wrap_json_pack(&tmp, "{s:s s:s* s:s* s:o*}",
+			"uid", src->uid().c_str(),
+			"api", src->api().c_str(),
+			"info", src->info().c_str(),
+			"verbs", verbInfo);
+			if(err)		
+				goto FAILURE;			
+		}
+		json_object_array_add(groups, tmp);	
+	}
+	err = wrap_json_pack(&info_, "{s:o s:o}",
+			"metadata", metadata,
+			"groups", groups);
+	return;
+	FAILURE:
+	info_ = NULL;
+}
+
+json_object* Composer::getInfo()
+{
+	return info_;
+}
+
 int Composer::execSignalsSubscription(afb_req_t request)
 {
 	int err = 0;;

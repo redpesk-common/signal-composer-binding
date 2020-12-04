@@ -66,6 +66,16 @@ std::string SourceAPI::api() const
 	return api_;
 }
 
+std::string SourceAPI::uid() const
+{
+	return uid_;
+}
+
+std::string SourceAPI::info() const
+{
+	return info_;
+}
+
 /// @brief callback for receiving message from low bindings. This will call back
 /// an action defined in the configuration files depending on the events
 /// received from an API.

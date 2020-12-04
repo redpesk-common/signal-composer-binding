@@ -29,6 +29,7 @@ private:
 	std::vector<json_object*> ctlActionsJ_; ///< Vector of action json object to be kept if we want to freed them correctly avoiding leak mem.
 	std::vector<std::shared_ptr<SourceAPI>> newSourcesListV_;
 	std::vector<std::shared_ptr<SourceAPI>> sourcesListV_;
+	json_object *info_;
 
 	explicit Composer(const std::string& filepath);
 	Composer();
@@ -59,4 +60,6 @@ public:
 	std::vector<std::shared_ptr<Signal>> getAllSignals();
 	std::vector<std::shared_ptr<Signal>> searchSignals(const std::string& aName);
 	json_object* getSignalValue(std::shared_ptr<Signal> sig, json_object* options);
+	void setInfo(json_object *verbInfo);
+	json_object *getInfo();
 };

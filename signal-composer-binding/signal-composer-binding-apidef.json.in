@@ -2,11 +2,11 @@
 	"openapi": "3.0.0",
 	"$schema": "http://iot.bzh/download/openapi/schema-3.0/default-schema.json",
 	"info": {
-		"description": "",
-		"title": "signals-composer-service",
-		"version": "4.0",
+		"description": "@PROJECT_DESCRIPTION@",
+		"title": "@PROJECT_NAME@",
+		"version": "@PROJECT_VERSION@",
 		"x-binding-c-generator": {
-			"api": "signal-composer",
+			"api": "@API_NAME@",
 			"version": 2,
 			"prefix": "",
 			"postfix": "",

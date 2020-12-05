@@ -20,11 +20,8 @@
 # Control Policy Config file
 ##################################################
 PROJECT_TARGET_ADD(signal-composer-config)
-
-	file(GLOB CONF_FILES "*.json")
-
-	add_input_files("${CONF_FILES}")
-
+	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/control-${TARGET_NAME}.json.in ${CMAKE_CURRENT_SOURCE_DIR}/control-${TARGET_NAME}.json)
+	add_input_files(${CMAKE_CURRENT_SOURCE_DIR}/control-${TARGET_NAME}.json)
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 	LABELS "BINDING-CONFIG"
 	OUTPUT_NAME ${TARGET_NAME}

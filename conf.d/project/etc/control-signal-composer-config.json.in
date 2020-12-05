@@ -1,0 +1,9 @@
+{
+	"$schema": "http://iot.bzh/download/public/schema/json/signal-composer-schema.json",
+	"metadata": {
+		"uid": "@PROJECT_NAME@",
+		"version": "@PROJECT_VERSION@",
+		"api": "@API_NAME@",
+		"info": "@PROJECT_DESCRIPTION@"
+	}
+}

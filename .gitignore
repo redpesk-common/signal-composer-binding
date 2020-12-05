@@ -21,3 +21,4 @@ GTAGS
 3rdparty/lua/
 xds-project.conf
 signal-composer-binding/signal-composer-binding-apidef.h
+*-redhat-linux-gnu/

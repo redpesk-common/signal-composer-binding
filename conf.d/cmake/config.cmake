@@ -84,7 +84,7 @@ set(INSTALL_PREFIX $ENV{HOME}/opt)
 # Customize link option
 # -----------------------------
 #list(APPEND link_libraries -an-option)
-list(APPEND link_libraries afb-helpers)
+list(APPEND link_libraries afb-libhelpers)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language

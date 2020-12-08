@@ -1,0 +1,35 @@
+{
+	"$schema": "http://iot.bzh/download/public/schema/json/signal-composer-schema.json",
+	"metadata": {
+		"uid": "signal-composer-binding",
+		"version": "1.0.0",
+		"api": "signal-composer",
+        "info": "Signal composer API connected to low level services",
+        "require": ["canbus"]
+	},
+    "plugins":
+    {
+        "uid":"@TARGET_NAME@-plugin",
+        "info": "A signal composer plugin meant to collect, process and push NMEA200 data coming from the low-can binding, to a redis TSDB",
+        "libs":"@TARGET_NAME@.ctlso"
+    },
+    "sources":
+    {
+    "uid":"Canbus service",
+    "api":"canbus",
+    "info":"Low level binding to handle CAN bus communications",
+    "getSignals":
+        {"action": "api://canbus#subscribe"}
+    },
+      "signals" :
+    {
+      "uid":"@TARGET_NAME@-speed",
+      "event": "canbus/messages.Wind.Data.Wind.Speed",
+      "unit": "m/s",
+      "retention": 5,
+      "getSignalsArgs":
+        {"event": "messages.Wind.Data.Wind.Speed"},
+      "onReceived":
+        {"action":"plugin://@TARGET_NAME@-plugin#example"}
+    }
+}

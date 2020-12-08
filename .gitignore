@@ -22,5 +22,6 @@ GTAGS
 xds-project.conf
 signal-composer-binding/signal-composer-binding-apidef.h
 *-redhat-linux-gnu/
+_plugin_template/control-signal-composer-config.json
 signal-composer-binding/signal-composer-binding-apidef.json
 conf.d/project/etc/control-signal-composer-config.json

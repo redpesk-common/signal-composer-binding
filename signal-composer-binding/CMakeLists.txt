@@ -17,7 +17,12 @@
 # limitations under the License.
 ###########################################################################
 
-INSTALL(FILES signal-composer.hpp source.hpp signal.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+INSTALL(FILES 	signal-composer.hpp
+				source.hpp
+				signal.hpp
+				observer-pattern.hpp
+				clientApp.hpp
+				DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
 
 # Add target to project dependency list
 PROJECT_TARGET_ADD(signal-composer)

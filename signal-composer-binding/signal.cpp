@@ -169,6 +169,14 @@ const std::string Signal::id() const
 	return id_;
 }
 
+const std::string Signal::eventName() const
+{
+	if(event_.find("/"))
+		if(event_.length() > event_.find("/"))
+			return event_.substr(event_.find("/")+1);
+	return event_;
+}
+
 /// @brief Build a JSON object with data members of Signal object
 ///
 /// @return the built JSON object representing the Signal
@@ -381,9 +389,9 @@ void Signal::defaultReceivedCB(Signal *signal, json_object *eventJ)
 	while(!json_object_iter_equal(&iter, &iterEnd))
 	{
 		std::string key = json_object_iter_peek_name(&iter);
-		std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 		json_object *value = json_object_iter_peek_value(&iter);
 		if (key.find("value") != std::string::npos ||
+			key.find(signal->eventName()) != std::string::npos ||
 			key.find(signal->id()) != std::string::npos)
 		{
 			sv = json_object_get(value);
@@ -397,7 +405,7 @@ void Signal::defaultReceivedCB(Signal *signal, json_object *eventJ)
 
 	if(!sv)
 	{
-		AFB_ERROR("No data found to set signal %s in %s", signal->id().c_str(), json_object_to_json_string(eventJ));
+		AFB_ERROR("No data found to set signal %s with key \"value\" or \"%s\" or \"%s\" in %s", signal->id().c_str(), signal->eventName().c_str(), signal->id().c_str(), json_object_to_json_string(eventJ));
 		return;
 	}
 	else if(ts == 0)

@@ -37,7 +37,7 @@ PROJECT_TARGET_ADD(signal-composer)
 
 # Add target to project dependency list
 PROJECT_TARGET_ADD(signal-composer-binding)
-
+	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}-apidef.json.in ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}-apidef.json)
 	# Define project Targets
 	add_library(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
 

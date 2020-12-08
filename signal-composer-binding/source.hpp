@@ -52,6 +52,8 @@ public:
 
 	void init();
 	std::string api() const;
+	std::string uid() const;
+	std::string info() const;
 
 	static void onSourceEvents(void *closure,
 				const char *event_name,

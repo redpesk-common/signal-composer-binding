@@ -22,7 +22,7 @@
 #include <filescan-utils.h>
 #include <afb/afb-binding>
 
-#include "signal-composer-apidef.h"
+#include "signal-composer-binding-apidef.h"
 #include "clientApp.hpp"
 
 /// @brief verb that loads JSON configuration to add sources and/or signals
@@ -113,6 +113,68 @@ void list(afb_req_t request)
 		{afb_req_fail(request, "error", "No Signals recorded so far");}
 }
 
+/// @brief get current signal-composer configuration
+void info(afb_req_t request)
+{
+	json_object *info;
+	Composer& composer = Composer::instance();
+	info = composer.getInfo();
+	if(!info)
+		afb_req_fail(request, "error", "An error occurred while retrieving configuration");
+	else
+		afb_req_success(request, info, NULL);
+	
+}
+
+const char *getVerbInfo(const char *verb)
+{
+	json_object *description, *verbList, *infoList, *info;
+	char *verbPath;
+	verbPath = (char *)malloc(strlen(verb)*sizeof(char)+1);
+	sprintf(verbPath, "/%s", verb);
+	description = json_tokener_parse(_afb_description_signal_composer);
+	json_object_object_get_ex(description, "paths", &verbList);
+	if(!verbList)
+		goto FAILURE;
+	json_object_object_get_ex(verbList, verbPath, &infoList);
+	if(!verbList)
+		goto FAILURE;
+	json_object_object_get_ex(infoList, "description", &info);
+	if(!info)
+		goto FAILURE;
+	return json_object_to_json_string(info);
+	FAILURE:
+		return NULL;
+}
+
+json_object *getVerb()
+{
+	int err;
+	json_object *verb, *sample, *tmp;
+	verb = json_object_new_array();
+	for(int idx = 0; idx < sizeof(_afb_verbs_signal_composer)/sizeof(afb_verb_v3); idx++)
+	{
+		if(_afb_verbs_signal_composer[idx].verb)
+		{
+			err = wrap_json_pack(&sample, "{s:o}",
+				"action", json_object_new_string(_afb_verbs_signal_composer[idx].verb));
+			if(err)
+				goto FAILURE;
+			err = wrap_json_pack(&tmp, "{s:o s:s* s:o s:o}",
+				"uid", json_object_new_string(_afb_verbs_signal_composer[idx].verb),
+				"info", getVerbInfo(_afb_verbs_signal_composer[idx].verb),
+				"verb", json_object_new_string(_afb_verbs_signal_composer[idx].verb),
+				"sample", sample);
+			if(err)
+				goto FAILURE;
+			json_object_array_add(verb, tmp);
+		}
+	}
+	return verb;
+	FAILURE:
+	return NULL;
+}
+
 int loadConf(afb_api_t api)
 {
 	int err = 0;
@@ -129,7 +191,7 @@ int execConf(afb_api_t api)
 	Composer& composer = Composer::instance();
 	int err = 0;
 	CtlConfigExec(api, composer.ctlConfig());
-
+	composer.setInfo(getVerb());
 	AFB_DEBUG("Signal Composer Control configuration Done.");
 
 	return err;

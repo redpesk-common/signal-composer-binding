@@ -84,6 +84,7 @@ public:
 	std::shared_ptr<Signal> get_shared_ptr();
 
 	const std::string id() const;
+	const std::string eventName() const;
 	json_object* toJSON() const;
 	struct signalCBT* get_context();
 	json_object *getSignalsArgs();

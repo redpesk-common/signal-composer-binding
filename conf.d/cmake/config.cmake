@@ -20,7 +20,7 @@
 # ------------------
 set(PROJECT_NAME signal-composer-binding)
 set(PROJECT_PRETTY_NAME "Signal composer")
-set(PROJECT_DESCRIPTION "Signal composer API connected to low level AGL services")
+set(PROJECT_DESCRIPTION "Signal composer API connected to low level services")
 set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/#/admin/projects/apps/agl-service-signal-composer")
 set(PROJECT_ICON "icon.png")
 set(PROJECT_AUTHOR "Forlot Romain")
@@ -84,7 +84,7 @@ set(INSTALL_PREFIX $ENV{HOME}/opt)
 # Customize link option
 # -----------------------------
 #list(APPEND link_libraries -an-option)
-list(APPEND link_libraries afb-helpers)
+list(APPEND link_libraries afb-libhelpers)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language

@@ -21,7 +21,8 @@
 	</feature>
 
 	<feature name="urn:AGL:widget:required-api">
-		<param name="low-can" value="ws" />
+		<param name="canbus" value="ws" />
 		<param name="gps" value="ws" />
+		<param name="redis" value="ws" />
 	</feature>
 </widget>

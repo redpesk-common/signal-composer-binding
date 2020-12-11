@@ -686,7 +686,7 @@ void Composer::setInfo(json_object *verbInfo)
 
 json_object* Composer::getInfo()
 {
-	return info_;
+	return json_object_get(info_);
 }
 
 int Composer::execSignalsSubscription(afb_req_t request)

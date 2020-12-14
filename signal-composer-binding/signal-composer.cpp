@@ -564,19 +564,6 @@ json_object* Composer::getSignalValue(std::shared_ptr<Signal> sig, json_object* 
 	return finalResponse;
 }
 
-json_object *getVerbUsage()
-{
-	json_object *usage;
-	int err;
-	err = wrap_json_pack(&usage, "{s:[s s s s s] s:s}",
-		"action",
-		"get", "config", "change", "subscribe", "unsubscribe",
-		"data", "json_object");
-	if(err)
-		return NULL;
-	return usage;
-}
-
 json_object *getVerbSample()
 {
 	int err;
@@ -589,37 +576,23 @@ json_object *getVerbSample()
 		"average", 1);
 	if(err)
 		goto FAILURE;
-	err = wrap_json_pack(&tmp, "{s:s s:o}",
-		"action", "get",
-		"data", arg);
+	err = wrap_json_pack(&tmp, "{s:o}",
+		"get", arg);
 	if(err)
 		goto FAILURE;
 	json_object_array_add(sample, tmp);
-	err = wrap_json_pack(&tmp, "{s:s}",
-		"action", "config");
-	if(err)
-		goto FAILURE;
-	json_object_array_add(sample, tmp);
+	json_object_array_add(sample, json_object_new_string("config"));
 	err = wrap_json_pack(&arg, "{s:i}",
 		"retention", 1);
 	if(err)
 		goto FAILURE;
-	err = wrap_json_pack(&tmp, "{s:s s:o}",
-		"action", "change",
-		"data", arg);
+	err = wrap_json_pack(&tmp, "{s:o}",
+		"change", arg);
 	if(err)
 		goto FAILURE;
 	json_object_array_add(sample, tmp);
-	err = wrap_json_pack(&tmp, "{s:s}",
-		"action", "subscribe");
-	if(err)
-		goto FAILURE;
-	json_object_array_add(sample, tmp);
-	err = wrap_json_pack(&tmp, "{s:s}",
-		"action", "unsubscribe");
-	if(err)
-		goto FAILURE;
-	json_object_array_add(sample, tmp);
+	json_object_array_add(sample, json_object_new_string("subscribe"));
+	json_object_array_add(sample, json_object_new_string("unsubscribe"));
 	return sample;
 	FAILURE:
 	return NULL;
@@ -647,10 +620,9 @@ void Composer::setInfo(json_object *verbInfo)
 		{
 			for(std::shared_ptr<Signal> sig: src->getSignals())
 			{
-				err = wrap_json_pack(&tmp, "{s:s s:s s:o* s:o*}",
+				err = wrap_json_pack(&tmp, "{s:s s:s s:o*}",
 				"uid", sig->id().c_str(),
 				"verb", sig->id().c_str(),
-				"usage", getVerbUsage(),
 				"sample", getVerbSample());
 				if(err)
 					goto FAILURE;

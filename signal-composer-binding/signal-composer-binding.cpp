@@ -156,10 +156,8 @@ json_object *getVerb()
 	{
 		if(_afb_verbs_signal_composer[idx].verb)
 		{
-			err = wrap_json_pack(&sample, "{s:o}",
-				"action", json_object_new_string(_afb_verbs_signal_composer[idx].verb));
-			if(err)
-				goto FAILURE;
+			sample = json_object_new_array();
+			json_object_array_add(sample, json_object_new_string(_afb_verbs_signal_composer[idx].verb));
 			err = wrap_json_pack(&tmp, "{s:o s:s* s:o s:o}",
 				"uid", json_object_new_string(_afb_verbs_signal_composer[idx].verb),
 				"info", getVerbInfo(_afb_verbs_signal_composer[idx].verb),

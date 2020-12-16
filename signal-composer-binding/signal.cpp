@@ -47,13 +47,18 @@ extern "C" void signal_verb(afb_req_t request)
 		if(sig->change(optionsJ))
 			afb_req_fail_f(request, "Changing the configuration of signal '%s' failed.", sig->id().c_str());
 		else
-			afb_req_success(request, ret, "config");
+			afb_req_success(request, ret, "change");
 	}
 	else if(json_object_is_type(actionJ, json_type_string))
 	{
 		clientAppCtx *cContext = reinterpret_cast<clientAppCtx*>(afb_req_context(request, 0, Composer::createContext, Composer::destroyContext, nullptr));
 		action = json_object_get_string(actionJ);
-		if(action == "config")
+		if(action == "get")
+		{
+			ret = composer.getSignalValue(sig, nullptr);
+			afb_req_success(request, ret, "get");
+		}
+		else if(action == "config")
 		{
 			afb_req_success(request, sig->config(), "config");
 		}

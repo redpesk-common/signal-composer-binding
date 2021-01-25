@@ -108,9 +108,14 @@ void list(afb_req_t request)
 		{json_object_array_add(allSignalsJ, sig->toJSON());}
 
 	if(json_object_array_length(allSignalsJ))
-		{afb_req_success(request, allSignalsJ, NULL);}
+	{
+		afb_req_success(request, allSignalsJ, NULL);
+	}
 	else
-		{afb_req_fail(request, "error", "No Signals recorded so far");}
+	{
+		json_object_put(allSignalsJ);
+		afb_req_fail(request, "error", "No Signals recorded so far");
+	}
 }
 
 /// @brief get current signal-composer configuration
@@ -123,7 +128,7 @@ void info(afb_req_t request)
 		afb_req_fail(request, "error", "An error occurred while retrieving configuration");
 	else
 		afb_req_success(request, info, NULL);
-	
+
 }
 
 const char *getVerbInfo(const char *verb)

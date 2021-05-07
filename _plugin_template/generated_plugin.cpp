@@ -40,7 +40,7 @@ extern "C"
         Signal* sig;
         ctx = (struct signalCBT*)source->context;
         sig = (Signal*) ctx->aSignal;
-        sig->set(0, json_object_new_int(42))
+        sig->set(0, json_object_new_int(42));
         return 0;
     }
 }

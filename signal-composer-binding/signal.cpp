@@ -89,13 +89,13 @@ Signal::Signal(const std::string& id, const std::string& event, std::vector<std:
  dependsSigV_(depends),
  timestamp_(0.0),
  value_(),
+ onReceived_(onReceived),
+ getSignalsArgs_(getSignalsArgs),
+ signalCtx_({nullptr, nullptr}),
  retention_(retention),
  frequency_(frequency),
  unit_(unit),
  metadata_(metadata),
- onReceived_(onReceived),
- getSignalsArgs_(getSignalsArgs),
- signalCtx_({nullptr, nullptr}),
  subscribed_(false)
 {
 	struct afb_auth* auth = (struct afb_auth*) calloc(1, sizeof(struct afb_auth));

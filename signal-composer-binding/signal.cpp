@@ -331,7 +331,7 @@ void Signal::set(uint64_t timestamp, json_object* value)
 	uint64_t diff = retention_+1;
 	value_ = value;
 	timestamp_ = timestamp;
-	history_[timestamp_] = json_object_get(value_);
+	history_[timestamp_] = value_;
 
 	while(diff > retention_)
 	{
@@ -630,7 +630,7 @@ json_object * Signal::maximum(int seconds) const
 /// @return Last value
 json_object* Signal::last_value() const
 {
-	return value_;
+	return json_object_get(value_);
 }
 
 uint64_t Signal::last_timestamp() const

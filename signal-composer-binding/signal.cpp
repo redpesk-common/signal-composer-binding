@@ -387,27 +387,8 @@ void Signal::update(Signal* sig)
 void Signal::defaultReceivedCB(Signal *signal, json_object *eventJ)
 {
 	uint64_t ts = 0;
-	json_object* sv = nullptr;
 	json_object_iterator iter;
 	json_object_iterator iterEnd;
-
-	if (json_object_is_type(eventJ, json_type_array)) {
-		sv = eventJ;
-		if(!sv)
-		{
-			AFB_ERROR("No data found to set signal %s with key \"value\" or \"%s\" or \"%s\" in %s", signal->id().c_str(), signal->eventName().c_str(), signal->id().c_str(), json_object_to_json_string(eventJ));
-			return;
-		}
-		else if(ts == 0)
-		{
-			struct timespec t;
-
-			if(!::clock_gettime(CLOCK_REALTIME, &t))
-				ts = (uint64_t)(t.tv_sec) * (uint64_t)NANO + (uint64_t)(t.tv_nsec);
-		}
-
-		signal->set(ts, sv);
-	}
 
 	iter = json_object_iter_begin(eventJ);
 	iterEnd = json_object_iter_end(eventJ);
@@ -416,19 +397,20 @@ void Signal::defaultReceivedCB(Signal *signal, json_object *eventJ)
 	{
 		std::string key = json_object_iter_peek_name(&iter);
 		json_object *value = json_object_iter_peek_value(&iter);
-		if (key.find("value") != std::string::npos ||
-			key.find(signal->eventName()) != std::string::npos ||
-			key.find(signal->id()) != std::string::npos)
-		{
-			sv = json_object_get(value);
-		}
-		else if (key.find("timestamp") != std::string::npos)
-		{
+		if (key.find("timestamp") != std::string::npos)
 			ts = json_object_is_type(value, json_type_int) ? json_object_get_int64(value):ts;
-		}
 		json_object_iter_next(&iter);
 	}
 
+	if(ts == 0)
+	{
+		struct timespec t;
+
+		if(!::clock_gettime(CLOCK_REALTIME, &t))
+			ts = (uint64_t)(t.tv_sec) * (uint64_t)NANO + (uint64_t)(t.tv_nsec);
+	}
+
+	signal->set(ts, json_object_get(eventJ));
 }
 
 /// @brief Notify observers that there is a change and execute callback defined

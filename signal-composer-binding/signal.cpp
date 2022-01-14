@@ -390,16 +390,23 @@ void Signal::defaultReceivedCB(Signal *signal, json_object *eventJ)
 	json_object_iterator iter;
 	json_object_iterator iterEnd;
 
-	iter = json_object_iter_begin(eventJ);
-	iterEnd = json_object_iter_end(eventJ);
+	if (!json_object_is_type(eventJ, json_type_object)) {
+		if (!eventJ) {
+			AFB_ERROR("No data found to set signal %s with key \"value\" or \"%s\" or \"%s\" in %s", signal->id().c_str(), signal->eventName().c_str(), signal->id().c_str(), json_object_to_json_string(eventJ));
+			return;
+		}
+	} else {
+		iter = json_object_iter_begin(eventJ);
+		iterEnd = json_object_iter_end(eventJ);
 
-	while(!json_object_iter_equal(&iter, &iterEnd))
-	{
-		std::string key = json_object_iter_peek_name(&iter);
-		json_object *value = json_object_iter_peek_value(&iter);
-		if (key.find("timestamp") != std::string::npos)
-			ts = json_object_is_type(value, json_type_int) ? json_object_get_int64(value):ts;
-		json_object_iter_next(&iter);
+		while(!json_object_iter_equal(&iter, &iterEnd))
+		{
+			std::string key = json_object_iter_peek_name(&iter);
+			json_object *value = json_object_iter_peek_value(&iter);
+			if (key.find("timestamp") != std::string::npos)
+				ts = json_object_is_type(value, json_type_int) ? json_object_get_int64(value):ts;
+			json_object_iter_next(&iter);
+		}
 	}
 
 	if(ts == 0)
